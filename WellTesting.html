@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Well Testing</title>
+</head>
+<style type="text/css">
+    h1 {
+        text-align: center;
+        padding: 15px;
+        background: #007991;
+        background: #D31027;
+        background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+        background: linear-gradient(to right, #EA384D, #D31027);
+        color: black;
+        letter-spacing: 0.2rem;
+        margin-bottom: 80px;
+    }
+
+    .wellBar {
+        width: 412px;
+        overflow: hidden;
+        margin: 20 0 0 450px;
+        padding: 40px;
+        background: #9fa2f5;
+        border-radius: 15px;
+    }
+
+    #wellBarcode {
+        width: 400px;
+        height: 40px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+    #pollBarcode {
+        width: 400px;
+        height: 40px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+    #result {
+        width: 100px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+    #add {
+        width: 150px;
+        height: 35px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+</style>
+
+<body>
+    <h1>Well Testing</h1>
+    <form>
+        <div class="wellBar">
+            <label for="wellBarcode"><b> Well Barcode
+                </b>
+            </label><br>
+            <input type="text" name="wellBarcode" id="wellBarcode" placeholder="Well Barcode" required><br><br>
+            <label for="pollBarcode"><b>Poll Barcode
+                </b>
+            </label><br>
+            <input type="text" name="pollBarcode" id="pollBarcode" placeholder="Poll Barcode" required><br><br>
+            <label for="result"><b>Result:
+                </b>
+            </label>
+            <select name="result" id="result">
+                <option value="inProgress">in-progress</option>
+                <option value="positive">positive</option>
+                <option value="negative">negative</option>
+            </select><br><br>
+            <button type="submit" id="add">Add</button><br><br>
+        </div>
+    </form>
+</body>
