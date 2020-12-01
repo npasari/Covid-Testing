@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pool Mapping</title>
+</head>
+
+<style type="text/css">
+    h1 {
+        text-align: center;
+        padding: 20px;
+        background: #007991;
+        background: #D31027;
+        background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+        background: linear-gradient(to right, #EA384D, #D31027);
+        color: black;
+        letter-spacing: 0.2rem;
+        margin-bottom: 90px;
+    }
+
+    .poolMapping {
+        width: 412px;
+        overflow: hidden;
+        margin: auto;
+        margin: 20 0 0 450px;
+        padding: 80px;
+        background: #9fa2f5;
+        border-radius: 15px;
+    }
+
+    #poolBarcode {
+        width: 400px;
+        height: 50px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+    #test {
+        border-style: solid;
+        border-radius: 3px;
+        padding-left: 25px;
+        padding-top: 10px;
+        padding-right: 25px;
+        padding-bottom: 10px;
+    }
+
+    #testBarcode {
+        float: left;
+        width: 250px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+        margin-right: 25px;
+    }
+
+    #deleteTest {
+        float: left;
+        color: darkred;
+        width: 70px;
+        height: 30px;
+        border-radius: 3px;
+    }
+
+    #addTest {
+        width: 100px;
+        height: 30px;
+        color: blue;
+        border-radius: 3px;
+    }
+
+    #submitPool {
+        width: 400px;
+        height: 50px;
+        border: none;
+        border-radius: 17px;
+        padding-left: 7px;
+        color: blue;
+    }
+
+    span {
+        font-size: 17px;
+    }
+</style>
+
+<script>
+    function addTestBarcode() {
+        const div = document.createElement('test');
+        div.className = 'testBarcode';
+
+        div.innerHTML = `
+        <input type="text" name="testBarcode" id="testBarcode" placeholder="Test Barcode" required>
+        <button id= "deleteTest" onclick="deleteTestBarcode(this);">delete</button><br><br>
+        `;
+
+        document.getElementById('test').appendChild(div);
+
+    }
+
+    //for the first barcode that is shown when window is loaded
+    function deleteTestBarcode1 (selectedField) {
+        selectedField.closest('.input_field').remove();
+    }
+
+    //for additional barcodes
+    function deleteTestBarcode (input) {
+        document.getElementById('test').removeChild(input.parentNode);
+    }
+
+    //made separate function to submit since making a form action GET method overrides onclick functions
+    function submit(){
+        document.getElementById('poolMapForm').submit();
+    }
+
+</script>
+
+<body>
+    <h1>Pool Mapping</h1>
+    <div class="poolMapping">
+        <!-- <form action="/submitPool" method="get"> -->
+        <form id = "poolMapForm"></form>
+            <label for="poolBarcode"><b>Pool Barcode</b></label><br>
+            <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
+            
+            
+            <label for="testBarcodes"><b>Test Barcodes</b></label><br>
+            <div id="test">
+                <div class="input_field">
+                    <input type="text" name="testBarcode" id="testBarcode" placeholder="Test Barcode" required>
+                    <button id= "deleteTest" onclick="deleteTestBarcode1(this);">delete</button><br><br>    
+                </div>    
+            </div><br>
+            <button id= "addTest" onclick="addTestBarcode()">Add Barcode</button><br><br>
+            <button type="submit" id="submitPool" onclick="submit()">Submit Pool</button><br><br>
+        </form>
+    </div>
+</html>
