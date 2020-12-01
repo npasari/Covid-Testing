@@ -18,6 +18,14 @@ app.get("/", function (req, res) {
     writeHomePage(req, res);
 });
 
+app.get("/labtechLogin", function(req, res){
+    technicianLogin(req, res);
+});
+
+app.get("/labHome", function(req, res){
+    labHome(req, res);
+});
+
 app.get("/employeeLogin", function (req, res) {
     employeeLogin(req, res);
 });
@@ -29,7 +37,7 @@ function writeHomePage(req, res) {
         <head>
             <title>COVID19 TESTING</title>
         </head>
-        <style>
+        <style type="text/css">
         h1{  
             text-align: center;  
             padding: 20px;  
@@ -81,13 +89,160 @@ function writeHomePage(req, res) {
             <form action = "/employeeLogin" method="get">
                 <button name="employee" id="empButton">Employee Login</button></form><br>
             <form action ="/labtechLogin" method="get">
-                <button name="labtech" id="techButton"> Lab Technician Login</button></form>
+                <button name="labtech" id="techButton">Lab Technician Login</button></form>
             </div>
         </body>
     </html>`
     res.write(html);
     res.end();
 }
+
+//Lab Technician Login Page which takes you to the Lab Home
+function technicianLogin(req, res){
+    let html = `<!DOCTYPE html>
+    <html>
+    
+    <head>
+        <title>Technician Login Page</title>
+    </head>
+    <style type="text/css">
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background: #007991;
+            background: #D31027;
+            background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+            background: linear-gradient(to right, #EA384D, #D31027);
+            color: black;
+            letter-spacing: 0.2rem;
+            margin-bottom: 90px;
+        }
+    
+        .labLogin {
+            width: 412px;
+            overflow: hidden;
+            margin: auto;
+            margin: 20 0 0 450px;
+            padding: 80px;
+            background: #9fa2f5;
+            border-radius: 15px;
+        }
+    
+        #labId {
+            width: 400px;
+            height: 50px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+        }
+    
+        #pass {
+            width: 400px;
+            height: 50px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+    
+        }
+    
+        #labTechLogin {
+            width: 400px;
+            height: 50px;
+            border: none;
+            border-radius: 17px;
+            padding-left: 7px;
+            color: blue;
+        }
+    
+        span {
+            font-size: 17px;
+        }
+    </style>
+    
+    <body>
+        <h1>Lab Technician Login</h1>
+        <form action="/labHome" method="get">
+            <div class="labLogin">
+                <label for="labId"><b> Lab ID
+                    </b>
+                </label><br>
+                <input type="text" name="labId" id="labId" placeholder="Lab ID"><br><br>
+                <label for="pass"><b>Password
+                    </b>
+                </label><br>
+                <input type="password" name="password" id="pass" placeholder="Password"><br><br>
+                <button type="submit" id="labTechLogin">Lab Login</button><br><br>
+            </div>
+        </form>
+    </html>`
+    res.write(html);
+    res.end();
+}
+
+//Lab Home which gives you three buttons to select - Test Collection, Pool Mapping, Well Testing
+function labHome(req, res){
+    let html = `<!DOCTYPE html>
+    <html>
+    
+    <head>
+        <title>Lab Home Page</title>
+    </head>
+    <style type="text/css">
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background: #007991;
+            background: #D31027;
+            background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+            background: linear-gradient(to right, #EA384D, #D31027);
+            color: black;
+            letter-spacing: 0.2rem;
+            margin-bottom: 90px;
+        }
+    
+        .labHome {
+            width: 412px;
+            overflow: hidden;
+            margin: auto;
+            margin: 20 0 0 450px;
+            padding: 80px;
+            background: #9fa2f5;
+            border-radius: 15px;
+        }
+    
+        #lab_home {
+            width: 400px;
+            height: 50px;
+            border: none;
+            border-radius: 17px;
+            padding-left: 7px;
+            color: blue;
+        }
+    
+        span {
+            font-size: 17px;
+        }
+    </style>
+    
+    <body>
+        <h1>Lab Home</h1>
+        <div class="labHome">
+            <form action="/testCollection" method="get">
+                <button type="test_collection" id="lab_home">Test Collection</button><br><br>
+            </form>
+            <form action="/poolMapping" method="get">
+                <button type="pool_mapping" id="lab_home">Pool Mapping</button><br><br>
+            </form>
+            <form action="/wellTesting" method="get">
+                <button type="well_testing" id="lab_home">Well Testing</button><br><br>
+            </form>
+        </div>
+    
+    </html>`
+    res.write(html);
+    res.end();
+}
+
 
 //Employee Login page that takes you to results of the employee's covid test
 function employeeLogin(req, res) {
