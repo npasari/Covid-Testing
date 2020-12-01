@@ -119,7 +119,7 @@
     <h1>Pool Mapping</h1>
     <div class="poolMapping">
         <!-- <form action="/submitPool" method="get"> -->
-        <form id = "poolMapForm"></form>
+        <form id = "poolMapForm">
             <label for="poolBarcode"><b>Pool Barcode</b></label><br>
             <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
             
@@ -129,7 +129,7 @@
                 <div class="input_field">
                     <input type="text" name="testBarcode" id="testBarcode" placeholder="Test Barcode" required>
                     <button id= "deleteTest" onclick="deleteTestBarcode1(this);">delete</button><br><br>    
-                </div>    
+                </div>
             </div><br>
             <button id= "addTest" onclick="addTestBarcode()">Add Barcode</button><br><br>
             <button type="submit" id="submitPool" onclick="submit()">Submit Pool</button><br><br>
