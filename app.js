@@ -2,7 +2,7 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "",
+    password: "72Buggyrides",
     database: "cse316",
     port: 3306
 });
@@ -29,6 +29,15 @@ app.get("/labHome", function(req, res){
 app.get("/employeeLogin", function (req, res) {
     employeeLogin(req, res);
 });
+
+app.get("/employeeResults", function(req, res){
+    employeeResults(req, res);
+})
+
+app.post("/employeeResults", function(req, res){
+    res.send(req.body.email);
+})
+
 
 //Home page that gives the user two options to choose - Technician Login or Employee Login
 function writeHomePage(req, res) {
@@ -316,14 +325,108 @@ function employeeLogin(req, res) {
                 </b>
               </label><br>
               <input type="password" name="password" id="pass" placeholder="Password" required><br><br>
-              <button type="submit" id="login">Login</button><br><br>
+              <form method="post" action="/employeeResults"><button type="submit" id="login">Login</button></form><br><br>
             </div>
           </form>
     </body>
     </html>`
+
     res.write(html);
     res.end();
 }
+
+function employeeResults(req, res){
+    res.writeHead(200, { "Content-Type": "text/html"});
+    let query = url.parse(req.url, true).query;
+    let search = query.search ? query.search : "?";
+    let html = `<!DOCTYPE html>
+    <html lang = "en">
+    <head>
+    <title>Employee Results</title>
+    <style type="text/css">
+    h1{  
+        text-align: center;  
+        padding: 20px;  
+        background: #007991;
+        background: #D31027;
+        background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+        background: linear-gradient(to right, #EA384D, #D31027);
+        color: black;
+        letter-spacing: 0.2rem;
+        margin-bottom:90px;
+    }  
+    
+    .empLogin{  
+        width: 412px;  
+        overflow: hidden;  
+        margin: auto;  
+        margin: 20 0 0 450px;  
+        padding: 80px;  
+        background: #9fa2f5;  
+        border-radius: 15px ;  
+    }  
+    
+    #email{  
+        width: 400px;  
+        height: 50px;  
+        border: none;  
+        border-radius: 3px;  
+        padding-left: 8px;  
+    }  
+    
+    #pass{
+        width: 400px;  
+        height: 50px;  
+        border: none;  
+        border-radius: 3px;  
+        padding-left: 8px;  
+          
+    }
+    
+    #login{  
+        width: 400px;  
+        height: 50px;  
+        border: none;  
+        border-radius: 17px;  
+        padding-left: 7px;  
+        color: blue; 
+    }  
+    span{   
+        font-size: 17px;  
+    }  
+
+    </style>
+    </head>
+    <body>
+        <h1>Employee Testing Results</h1>
+        <table>
+        <tr>
+            <th>Collection Date</th>
+            <th>Result</th>
+        </tr>
+        </table>
+    </body>
+    </html>`;
+    let sql = `SELECT W.testingStartTime, W.result 
+                FROM WellTesting W, Employee E, Pool P, PoolMap P1
+                WHERE E.email = '%${email}%' AND E.testBarcode = P1.testBarcode AND P1.poolBarcode = P.poolBarcode
+                AND P1.poolBarcode = W.poolBarcode;`;
+    
+    connection.query(sql, function(err, result){
+        if(err) throw err;
+        for(let item of result){
+            html += `
+            <pre>
+            <tr>
+                <td> ` + item.testingStartTime + ` </td>
+                <td> ` + item.result + ` </td>  
+            </tr>
+            </pre>`
+        }
+        res.write(html + "\n\n</body>\n</html>");
+        res.end();
+    });
+};
 
 
 port = process.env.PORT || 3000;
