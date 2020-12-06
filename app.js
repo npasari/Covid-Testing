@@ -38,7 +38,6 @@ app.post("/employeeResults", function(req, res){
     res.send(req.body.email);
 })
 
-
 //Home page that gives the user two options to choose - Technician Login or Employee Login
 function writeHomePage(req, res) {
     let html = `<!DOCTYPE html>
