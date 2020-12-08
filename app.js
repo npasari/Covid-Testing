@@ -3,16 +3,29 @@ var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "72Buggyrides",
-    database: "cse316",
+    database: "final",
     port: 3306
 });
 
 const express = require('express');
+////const path = require('path');
+var session = require('express-session');
 const app = express();
+//const bodyParser = require("body-parser");
 const url = require('url');
 const {
     strict
 } = require('assert');
+const { request } = require('http');
+const { response } = require('express');
+
+// app.use(session({
+//     secret: 'secret',
+//     resave: true,
+//     saveUninitialized: true
+// }));
+// app.use(bodyParser.urlencoded({extended : true}));
+// app.use(bodyParser.json());
 
 app.get("/", function (req, res) {
     writeHomePage(req, res);
@@ -31,12 +44,29 @@ app.get("/employeeLogin", function (req, res) {
 });
 
 app.get("/employeeResults", function(req, res){
-    employeeResults(req, res);
-})
+        employeeResults(req, res);
+});
 
 app.post("/employeeResults", function(req, res){
-    res.send(req.body.email);
-})
+    var email = req.body.email;
+    var password = req.body.password;
+    if(email && password){
+        connection.query('SELECT * FROM Employee WHERE email = ?', [email], function(err, results, fields){
+            if(err) throw err;
+            else if(results.length > 0) {
+                //req.session.loggedin = true;
+                //req.session.email = email;
+                res.redirect('/employeeResults');
+            } else {
+                res.send('Incorrect Login!');
+            }
+            res.end();
+        });
+    } else {
+        res.send("Please enter Email and Password!");
+        res.end();
+    }
+});
 
 //Home page that gives the user two options to choose - Technician Login or Employee Login
 function writeHomePage(req, res) {
@@ -314,7 +344,7 @@ function employeeLogin(req, res) {
     </head>
     <body>
         <h1>Employee Login Page for Results</h1>
-        <form action ="/employeeResult" method="get">
+        <form action ="/employeeResults" method="post">
             <div class="empLogin">
               <label for="email"><b> Email
                 </b>
@@ -335,6 +365,7 @@ function employeeLogin(req, res) {
 }
 
 function employeeResults(req, res){
+    let email = req.body.email;
     res.writeHead(200, { "Content-Type": "text/html"});
     let query = url.parse(req.url, true).query;
     let search = query.search ? query.search : "?";
