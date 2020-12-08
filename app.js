@@ -10,22 +10,16 @@ var connection = mysql.createConnection({
 const express = require('express');
 ////const path = require('path');
 var session = require('express-session');
+var bodyParser = require('body-parser');
 const app = express();
-//const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 const url = require('url');
 const {
     strict
 } = require('assert');
 const { request } = require('http');
 const { response } = require('express');
-
-// app.use(session({
-//     secret: 'secret',
-//     resave: true,
-//     saveUninitialized: true
-// }));
-// app.use(bodyParser.urlencoded({extended : true}));
-// app.use(bodyParser.json());
 
 app.get("/", function (req, res) {
     writeHomePage(req, res);
@@ -44,18 +38,21 @@ app.get("/employeeLogin", function (req, res) {
 });
 
 app.get("/employeeResults", function(req, res){
+        console.log(email);
         employeeResults(req, res);
 });
 
 app.post("/employeeResults", function(req, res){
-    var email = req.body.email;
-    var password = req.body.password;
+    console.log(req.body.email);
+    const email = req.body.email;
+    console.log(email);
+    const password = req.body.password;
+    console.log(password);
     if(email && password){
         connection.query('SELECT * FROM Employee WHERE email = ?', [email], function(err, results, fields){
             if(err) throw err;
             else if(results.length > 0) {
-                //req.session.loggedin = true;
-                //req.session.email = email;
+                console.log(results);
                 res.redirect('/employeeResults');
             } else {
                 res.send('Incorrect Login!');
@@ -344,19 +341,17 @@ function employeeLogin(req, res) {
     </head>
     <body>
         <h1>Employee Login Page for Results</h1>
-        <form action ="/employeeResults" method="post">
             <div class="empLogin">
               <label for="email"><b> Email
                 </b>
               </label><br>
-              <input type="text" name="email" id="email" placeholder="Email" required><br><br>
+              <input type="text" name="email" id="email" placeholder="Email" required/><br><br>
               <label for="pass"><b>Password
                 </b>
               </label><br>
-              <input type="password" name="password" id="pass" placeholder="Password" required><br><br>
-              <form method="post" action="/employeeResults"><button type="submit" id="login">Login</button></form><br><br>
+              <input type="password" name="password" id="pass" placeholder="Password" required/><br><br>
+              <form enctype="text/html" method="post" action="/employeeResults"><button type="submit" id="login">Login</button></form><br><br>
             </div>
-          </form>
     </body>
     </html>`
 
@@ -366,6 +361,7 @@ function employeeLogin(req, res) {
 
 function employeeResults(req, res){
     let email = req.body.email;
+    console.log(email);
     res.writeHead(200, { "Content-Type": "text/html"});
     let query = url.parse(req.url, true).query;
     let search = query.search ? query.search : "?";
