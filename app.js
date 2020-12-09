@@ -50,25 +50,44 @@ app.get("/employeeResults", function(req, res){
 // THIS LOCATION FOR THE POST REQUESTS IS TEMPORARY, NEED TO MAKE ANOTHER .JS FILE FOR THE POSTS
 app.post("/addTestCollection", function(req, res) {
 
+        // for debugging
         console.log("req body after post request is " + req.body)
 
         // get testBarcode from testBarcode input text in html
+        var testbarcode = req.body.testB
+        console.log("testb is " + testbarcode)
+
         // get employeeID from employeeID input text in html
+        var empID = Number(req.body.eID)
 
-        /*
+        // get labID of current employee who's using the system
 
-        insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
-        VALUES ('47', '58', NOW(), 'abc')`;
+        selectQuery = `SELECT employeeID FROM Employee WHERE employee = ` + empID + `;`;
 
-        con.query(insertQuery, function (err, result) {
+        selectResult = ""
+        con.query(selectQuery, function(err, result) {
             if (err) throw err;
-            console.log("1 record inserted");
-        });
-        // get last filled row in LabEmployee, and collect 
+            selectResult = result
+        })
 
-        */
+        if (selectResult) {
+            insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+            VALUES (?, ?, ?, ?)`;
 
-        console.log(req.body.msg)
+            values = [testbarcode, empID, 'NOW()', 'abc'] // 'abc' is dummy labID until I get the actual labID
+
+            con.query(insertQuery, values, function (err, result) {
+                if (err) throw err;
+                console.log("1 record inserted");
+            });
+            // get last filled row in LabEmployee, and collect 
+        }
+        else {
+            console.log("Employee ID entered was not valid")
+        }
+
+        // for debugging
+        //console.log(req.body.msg)
 });
 
 app.post("/deleteTestCollection", function(req, res) {
