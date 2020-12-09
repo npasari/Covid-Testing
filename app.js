@@ -47,7 +47,6 @@ app.get("/employeeResults", function(req, res){
         employeeResults(req, res);
 });
 
-// THIS LOCATION FOR THE POST REQUESTS IS TEMPORARY, NEED TO MAKE ANOTHER .JS FILE FOR THE POSTS
 app.post("/addTestCollection", function(req, res) {
 
         // for debugging
@@ -61,11 +60,13 @@ app.post("/addTestCollection", function(req, res) {
         var empID = Number(req.body.eID)
 
         // get labID of current employee who's using the system
+        // insert here someday
 
+        // sql query to make sure employeeID exists in employee database
         selectQuery = `SELECT employeeID FROM Employee WHERE employee = ` + empID + `;`;
 
         selectResult = ""
-        con.query(selectQuery, function(err, result) {
+        connection.query(selectQuery, function(err, result) {
             if (err) throw err;
             selectResult = result
         })
@@ -74,13 +75,15 @@ app.post("/addTestCollection", function(req, res) {
             insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
             VALUES (?, ?, ?, ?)`;
 
-            values = [testbarcode, empID, 'NOW()', 'abc'] // 'abc' is dummy labID until I get the actual labID
+            // NOW() returns the sql current datetime object
+            // 'abc' is dummy labID until I get the actual labID
+            values = [testbarcode, empID, 'NOW()', 'abc'] 
 
-            con.query(insertQuery, values, function (err, result) {
+            connection.query(insertQuery, values, function (err, result) {
                 if (err) throw err;
                 console.log("1 record inserted");
+                console.log(result)
             });
-            // get last filled row in LabEmployee, and collect 
         }
         else {
             console.log("Employee ID entered was not valid")
@@ -94,14 +97,15 @@ app.post("/deleteTestCollection", function(req, res) {
 
         console.log("deleted successfully")
 
-        deleteQuery = ``
+        // user selects radio button, so get the employeeID from the same row as the radio button
 
-        /*
-        insertQuery = `DELETE into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
-        VALUES ('46', '57', NOW(), 'abc')`;
-        */
-
-        // get last filled row in LabEmployee, and collect 
+        deleteQuery = `DELETE FROM EmployeeTest WHERE`; // finish query
+        
+        connection.query(deleteQuery, function(err, result) {
+            if (err) throw err;
+            console.log("deleted successfully")
+        })
+        
 });
 
 app.post("/employeeResults", function(req, res){
