@@ -62,20 +62,18 @@ app.get("/addTestCollection", function(req, res) {
         //insert code for this here
 
         selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
-
         selectResult = ""
 
         con.query(selectQuery, function(err, result) {
             if (err) throw err;
             selectResult = result
-            console.log("selectResult is" + selectResult)
         })
 
-        if (selectResult) {
+        if (selectResult !== null) {
             insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
-            VALUES (?, ?, ?, ?)`;
+            VALUES (?, ?, NOW(), ?)`;
 
-            values = [testbarcode, empID, 'NOW()', 'abc'] // 'abc' is dummy labID until I get the actual labID
+            values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
 
             con.query(insertQuery, values, function (err, result) {
                 if (err) throw err;
