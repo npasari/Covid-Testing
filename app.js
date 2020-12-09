@@ -2,9 +2,9 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "72Buggyrides",
-    database: "final",
-    port: 3306
+    password: "C00ki3M0nst3r",
+    database: "finalprojectschema",
+    port: "3306"
 });
 
 const express = require('express');
@@ -64,7 +64,7 @@ app.get("/addTestCollection", function(req, res) {
         selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
         selectResult = ""
 
-        con.query(selectQuery, function(err, result) {
+        connection.query(selectQuery, function(err, result) {
             if (err) throw err;
             selectResult = result
         })
@@ -75,7 +75,7 @@ app.get("/addTestCollection", function(req, res) {
 
             values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
 
-            con.query(insertQuery, values, function (err, result) {
+            connection.query(insertQuery, values, function (err, result) {
                 if (err) throw err;
                 console.log("1 record inserted");
             });
