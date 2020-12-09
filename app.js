@@ -47,50 +47,45 @@ app.get("/employeeResults", function(req, res){
         employeeResults(req, res);
 });
 
-app.post("/addTestCollection", function(req, res) {
+app.get("/addTestCollection", function(req, res) {
 
-        // for debugging
-        console.log("req body after post request is " + req.body)
+        res.writeHead(200, { "Content-Type": "text/html" });
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-        // get testBarcode from testBarcode input text in html
-        var testbarcode = req.body.testB
+        var testbarcode = query.testB // get testBarcode from testBarcode input text in html
         console.log("testb is " + testbarcode)
 
-        // get employeeID from employeeID input text in html
-        var empID = Number(req.body.eID)
+        var empID = Number(query.eID)
+        console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
 
         // get labID of current employee who's using the system
-        // insert here someday
+        //insert code for this here
 
-        // sql query to make sure employeeID exists in employee database
-        selectQuery = `SELECT employeeID FROM Employee WHERE employee = ` + empID + `;`;
+        selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
 
         selectResult = ""
-        connection.query(selectQuery, function(err, result) {
+
+        con.query(selectQuery, function(err, result) {
             if (err) throw err;
             selectResult = result
+            console.log("selectResult is" + selectResult)
         })
 
         if (selectResult) {
             insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
             VALUES (?, ?, ?, ?)`;
 
-            // NOW() returns the sql current datetime object
-            // 'abc' is dummy labID until I get the actual labID
-            values = [testbarcode, empID, 'NOW()', 'abc'] 
+            values = [testbarcode, empID, 'NOW()', 'abc'] // 'abc' is dummy labID until I get the actual labID
 
-            connection.query(insertQuery, values, function (err, result) {
+            con.query(insertQuery, values, function (err, result) {
                 if (err) throw err;
                 console.log("1 record inserted");
-                console.log(result)
             });
+            // get last filled row in LabEmployee, and collect 
         }
         else {
             console.log("Employee ID entered was not valid")
         }
-
-        // for debugging
-        //console.log(req.body.msg)
 });
 
 app.post("/deleteTestCollection", function(req, res) {

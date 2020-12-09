@@ -79,18 +79,20 @@
 
     <h1> Test Collection </h1>
     <div class = "testCollect">
+
+      <form id = "addForm" action = '/addTestCollection' method = "get">
       <div>
           <label>Employee ID: </label>
-          <input type="text" id = "employeeID"/>
+          <input type="text" name = "eID" id = "employeeID"/>
       </div>
       <br>
       <div>
           <label>Test Barcode: </label>
-          <input type="text" id = "testbarcode"/>
+          <input type="text" name = "testB" id = "testbarcode"/>
       </div>
     </div>
 
-    <form id = "addForm" action = '/addTestCollection' method = "post">
+    
     <input type="submit" id = "addButton" value="Add"  />
     </form>
 
@@ -102,7 +104,7 @@
       </tr>
     </table>
 
-    <form id = "deleteForm" action = '/deleteTestCollection' method = "post">
+    <form id = "deleteForm" action = '/deleteTestCollection' method = "get">
     <input type= "submit" id = "deleteButton" value= "Delete"  />
     </form>
 
