@@ -55,8 +55,6 @@ app.post("/addTestCollection", function(req, res) {
         // get testBarcode from testBarcode input text in html
         // get employeeID from employeeID input text in html
 
-        // get labID of current employee who's using the system
-
         /*
 
         insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
