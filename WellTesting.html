@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Well Testing</title>
 </head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+</script>
 <style type="text/css">
     h1 {
         text-align: center;
@@ -56,6 +59,34 @@
         border-radius: 3px;
         padding-left: 8px;
     }
+
+    #edit {
+        width: 80px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+
+    #delete {
+        width: 80px;
+        height: 30px;
+        border: none;
+        border-radius: 3px;
+        padding-left: 8px;
+    }
+
+    .abc {
+        border-left: 7px solid #9bdfe8;
+        padding-left: 6px;
+        background-color: #9fa2f5;
+    }
+
+    .dist {
+        width: 150px;
+        transition: background, 2.0s;
+    }
 </style>
 
 <body>
@@ -65,11 +96,11 @@
             <label for="wellBarcode"><b> Well Barcode
                 </b>
             </label><br>
-            <input type="text" name="wellBarcode" id="wellBarcode" placeholder="Well Barcode" required><br><br>
+            <input type="text" name="wellBarcode" id="wellBarcode" placeholder="Well Barcode"><br><br>
             <label for="poolBarcode"><b>Pool Barcode
                 </b>
             </label><br>
-            <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
+            <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode"><br><br>
             <label for="result"><b>Result:
                 </b>
             </label>
@@ -78,7 +109,39 @@
                 <option value="positive">positive</option>
                 <option value="negative">negative</option>
             </select><br><br>
-            <button type="submit" id="add">Add</button><br><br>
+            <button type="submit" id="add" class="add" onclick="AddData(event)">Add</button><br><br>
         </div>
     </form>
+
+    <div id="tab">
+        <table id="list" border="1">
+            <thead>
+                <tr>
+                    <td class="abc dist">Well Barcode</td>
+                    <td class="abc dist">Pool Barcode</td>
+                    <td class="abc dist">Results</td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <br>
+
+    <button id="edit">Edit</button>
+    <button id="delete">Delete</button>
+
+
+
+    <script>
+        function AddData(e) {
+            e.preventDefault();
+            var rows = "";
+            var wellBarcode = document.getElementById("wellBarcode").value;
+            var poolBarcode = document.getElementById("poolBarcode").value;
+            var results = document.getElementById("result").value;
+            rows += "<tr><td>" + wellBarcode + "</td><td>" + poolBarcode + "</td><td>" + results + "</td></tr>";
+            $(rows).appendTo("#list tbody");
+        }
+    </script>
+
 </body>
