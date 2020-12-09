@@ -86,7 +86,7 @@ app.get("/addTestCollection", function(req, res) {
         }
 });
 
-app.post("/deleteTestCollection", function(req, res) {
+app.get("/deleteTestCollection", function(req, res) {
 
         console.log("deleted successfully")
 
@@ -94,11 +94,12 @@ app.post("/deleteTestCollection", function(req, res) {
 
         deleteQuery = `DELETE FROM EmployeeTest WHERE`; // finish query
         
+        /*
         connection.query(deleteQuery, function(err, result) {
             if (err) throw err;
             console.log("deleted successfully")
         })
-        
+        */  
 });
 
 app.post("/employeeResults", function(req, res){
