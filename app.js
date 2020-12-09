@@ -37,9 +37,54 @@ app.get("/employeeLogin", function (req, res) {
     employeeLogin(req, res);
 });
 
+app.get("/testCollection", function (req, res) {
+
+    res.sendFile(__dirname + 'testcollection.html')
+})
+
 app.get("/employeeResults", function(req, res){
         console.log(email);
         employeeResults(req, res);
+});
+
+// THIS LOCATION FOR THE POST REQUESTS IS TEMPORARY, NEED TO MAKE ANOTHER .JS FILE FOR THE POSTS
+app.post("/addTestCollection", function(req, res) {
+
+        console.log("req body after post request is " + req.body)
+
+        // get testBarcode from testBarcode input text in html
+        // get employeeID from employeeID input text in html
+
+        // get labID of current employee who's using the system
+
+        /*
+
+        insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+        VALUES ('47', '58', NOW(), 'abc')`;
+
+        con.query(insertQuery, function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+        // get last filled row in LabEmployee, and collect 
+
+        */
+
+        console.log(req.body.msg)
+});
+
+app.post("/deleteTestCollection", function(req, res) {
+
+        console.log("deleted successfully")
+
+        deleteQuery = ``
+
+        /*
+        insertQuery = `DELETE into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+        VALUES ('46', '57', NOW(), 'abc')`;
+        */
+
+        // get last filled row in LabEmployee, and collect 
 });
 
 app.post("/employeeResults", function(req, res){
