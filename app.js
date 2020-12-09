@@ -39,7 +39,7 @@ app.get("/employeeLogin", function (req, res) {
 
 app.get("/testCollection", function (req, res) {
 
-    res.sendFile(__dirname + 'testcollection.html')
+    res.sendFile(__dirname + '/testcollection.html')
 })
 
 app.get("/employeeResults", function(req, res){
