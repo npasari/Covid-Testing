@@ -47,45 +47,45 @@ app.get("/testCollection", function (req, res) {
 })
 
 app.get("/auth", function (req, res){
-        //res.writeHead(200, { "Content-Type": "text/html" });
-        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+         //res.writeHead(200, { "Content-Type": "text/html" });
+         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-        //var employeeEmail = req.body.email;
-        var employeeEmail = query.email;
-        console.log("email is " + employeeEmail);
-
-        //var password = req.body.email;
-        var password = query.password;
-        console.log("password is " + password);
-
-        var sql = `SELECT * FROM Employee;`;
-
-        let employeeIDValid = false // employeeID does not exist in table
-
-        connection.query(sql, function(err, result){
-            if (err) throw err;
-            var i = 0;
-            while(!employeeIDValid && i < result.length){
-                console.log("employee id vals: " + result[i].employeeID)
-                console.log(employeeEmail);
-                console.log(result[i].email);
-                console.log(password);
-                console.log(result[i].passcode);
-                if (employeeEmail == result[i].email && password == result[i].passcode){
-                    employeeIDValid = true
-                    // console.log(employeeEmail);
-                    // console.log(result[i].employeeID);
-                    // console.log(password);
-                    // console.log(result[i].passcode);
-                } // if the employeeID exists in the Employee Table
-                i++;
-            }
-            console.log("is employeeID in table? " + employeeIDValid)
-            if(employeeIDValid){
-                res.redirect('/EmployeeResults.html');
-            }
-        });
-        //res.end();
+         //var employeeEmail = req.body.email;
+         var employeeEmail = query.email;
+         console.log("email is " + employeeEmail);
+ 
+         //var password = req.body.email;
+         var password = query.password;
+         console.log("password is " + password);
+ 
+         var sql = `SELECT * FROM Employee;`;
+ 
+         let employeeIDValid = false // employeeID does not exist in table
+ 
+         connection.query(sql, function(err, result){
+             if (err) throw err;
+             var i = 0;
+             while(!employeeIDValid && i < result.length){
+                 console.log("employee id vals: " + result[i].employeeID)
+                 console.log(employeeEmail);
+                 console.log(result[i].email);
+                 console.log(password);
+                 console.log(result[i].passcode);
+                 if (employeeEmail == result[i].email && password == result[i].passcode){
+                     employeeIDValid = true
+                     // console.log(employeeEmail);
+                     // console.log(result[i].employeeID);
+                     // console.log(password);
+                     // console.log(result[i].passcode);
+                 } // if the employeeID exists in the Employee Table
+                 i++;
+             }
+             console.log("is employeeID in table? " + employeeIDValid)
+             if(employeeIDValid){
+                 res.redirect('/EmployeeResults.html');
+                 res.end();
+             }
+         });
 })
 
 app.get("/EmployeeResults", function(req, res){
