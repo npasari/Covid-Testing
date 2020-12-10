@@ -63,11 +63,42 @@ app.get("/addTestCollection", function(req, res) {
 
             selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
             selectResult = ""
+            
 
             connection.query(selectQuery, function(err, result) {
                 if (err) throw err;
                 selectResult = result
             })
+
+            employeeIDSelectQuery = `SELECT employeeID FROM Employee;`;
+            testbarcodeSelectQuery = `SELECT testBarcode FROM EmployeeTest;`;
+
+            let employeeIDValid = false // employeeID does not exist in table
+            let testbarcodeValid = true // testBarcode does exist
+
+            connection.query(employeeIDSelectQuery, function(err, result) {
+                if (err) throw err;
+                
+                for (i = 0; i < result.length; i++) {
+                    if (empID === result[i].employeeID) // if the employeeID exists in the Employee Table
+                        employeeIDValid = true
+                }
+            })
+
+            console.log("is employeeID in table? " + employeeIDValid)
+            
+            connection.query(testbarcodeSelectQuery, function(err, result) {
+                if (err) throw err;
+                
+                for (i = 0; i < result.length; i++) {
+                    if (testbarcode === result[i].testBarcode) // if the test barcode already exists, 
+                        testbarcodeValid = false
+                }
+            })
+
+            console.log("is testbarcode not in table? " + testbarcodeValid)
+
+            
 
             if (selectResult !== null) {
                 insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
