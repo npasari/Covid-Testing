@@ -26,15 +26,19 @@ app.get("/", function (req, res) {
 });
 
 app.get("/labtechLogin", function(req, res){
-    technicianLogin(req, res);
+    //technicianLogin(req, res);
+    res.sendFile(__dirname + '/TechnicianLogin.html')
+
 });
 
 app.get("/labHome", function(req, res){
-    labHome(req, res);
+    //labHome(req, res);
+    res.sendFile(__dirname + '/LabHome.html')
 });
 
 app.get("/employeeLogin", function (req, res) {
-    employeeLogin(req, res);
+    //employeeLogin(req, res);
+    res.sendFile(__dirname + '/EmployeeLogin.html')
 });
 
 app.get("/testCollection", function (req, res) {
@@ -48,58 +52,96 @@ app.get("/employeeResults", function(req, res){
 });
 
 app.get("/addTestCollection", function(req, res) {
+        try {
+            res.writeHead(200, { "Content-Type": "text/html" });
+            let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-        res.writeHead(200, { "Content-Type": "text/html" });
-        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+            var testbarcode = query.testB // get testBarcode from testBarcode input text in html
+            console.log("testb is " + testbarcode)
 
-        var testbarcode = query.testB // get testBarcode from testBarcode input text in html
-        console.log("testb is " + testbarcode)
+            var empID = Number(query.eID)
+            console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
 
-        var empID = Number(query.eID)
-        console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
+            // get labID of current employee who's using the system
+            //insert code for this here
 
-        // get labID of current employee who's using the system
-        //insert code for this here
+            selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
+            selectResult = ""
+            
 
-        selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
-        selectResult = ""
-
-        connection.query(selectQuery, function(err, result) {
-            if (err) throw err;
-            selectResult = result
-        })
-
-        if (selectResult !== null) {
-            insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
-            VALUES (?, ?, NOW(), ?)`;
-
-            values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
-
-            connection.query(insertQuery, values, function (err, result) {
+            connection.query(selectQuery, function(err, result) {
                 if (err) throw err;
-                console.log("1 record inserted");
-            });
-            // get last filled row in LabEmployee, and collect 
+                selectResult = result
+            })
+
+            employeeIDSelectQuery = `SELECT employeeID FROM Employee;`;
+            testbarcodeSelectQuery = `SELECT testBarcode FROM EmployeeTest;`;
+
+            let employeeIDValid = false // employeeID does not exist in table
+            let testbarcodeValid = true // testBarcode does exist
+
+            connection.query(employeeIDSelectQuery, function(err, result) {
+                if (err) throw err;
+                
+                for (i = 0; i < result.length; i++) {
+                    if (empID === result[i].employeeID) // if the employeeID exists in the Employee Table
+                        employeeIDValid = true
+                }
+            })
+
+            console.log("is employeeID in table? " + employeeIDValid)
+            
+            connection.query(testbarcodeSelectQuery, function(err, result) {
+                if (err) throw err;
+                
+                for (i = 0; i < result.length; i++) {
+                    if (testbarcode === result[i].testBarcode) // if the test barcode already exists, 
+                        testbarcodeValid = false
+                }
+            })
+
+            console.log("is testbarcode not in table? " + testbarcodeValid)
+
+            if (selectResult !== null) {
+                insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+                VALUES (?, ?, NOW(), ?)`;
+
+                // input 2 arrays - one with list of all employeeids and one with all test barcodes
+                // check if test barcode exists (aka non-duplicate)
+
+                values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
+
+                connection.query(insertQuery, values, function (err, result) {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                });
+                // get last filled row in LabEmployee, and collect 
+            }
+            else {
+                console.log("Employee ID entered was not valid")
+            }
         }
-        else {
-            console.log("Employee ID entered was not valid")
+
+        catch (e) {
+            console.log("could not add")
         }
 });
 
-app.get("/deleteTestCollection", function(req, res) {
-
-        console.log("deleted successfully")
-
-        // user selects radio button, so get the employeeID from the same row as the radio button
-
-        deleteQuery = `DELETE FROM EmployeeTest WHERE`; // finish query
+// switch to post request
+app.post("/deleteTestCollection", function(req, res) {
+        res.writeHead(200, { "Content-Type": "text/html" });
         
-        /*
+        // req.body contains whatever was in the "data" part of the Ajax post request
+        var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
+        var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
+        testbarcode = testbarcode.join("");
+
+        deleteQuery = `DELETE from EmployeeTest where testBarcode = ` + testbarcode + `;`;
+
         connection.query(deleteQuery, function(err, result) {
             if (err) throw err;
             console.log("deleted successfully")
         })
-        */  
 });
 
 app.post("/employeeResults", function(req, res){
@@ -191,6 +233,8 @@ function writeHomePage(req, res) {
     res.write(html);
     res.end();
 }
+
+/*
 
 //Lab Technician Login Page which takes you to the Lab Home
 function technicianLogin(req, res){
@@ -418,6 +462,8 @@ function employeeLogin(req, res) {
     res.write(html);
     res.end();
 }
+
+*/
 
 function employeeResults(req, res){
     let email = req.body.email;
