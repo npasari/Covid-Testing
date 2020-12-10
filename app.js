@@ -62,70 +62,64 @@ app.get("/addTestCollection", function(req, res) {
             var empID = Number(query.eID)
             console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
 
-            // get labID of current employee who's using the system
-            //insert code for this here
-
-            selectQuery = `SELECT employeeID FROM Employee WHERE employeeID = ` + empID + `;`;
-            selectResult = ""
-            
-
-            connection.query(selectQuery, function(err, result) {
-                if (err) throw err;
-                selectResult = result
-            })
+            // ATTENCION!!!!!!!!!
+            // GET LAB ID FROM THE HOME PAGE, IMPLEMENT RIGHT HERE
+            // ATTENCION!!!!!!!!!
 
             employeeIDSelectQuery = `SELECT employeeID FROM Employee;`;
             testbarcodeSelectQuery = `SELECT testBarcode FROM EmployeeTest;`;
 
             let employeeIDValid = false // employeeID does not exist in table
-            let testbarcodeValid = true // testBarcode does exist
+            let testbarcodeDoesNotExist = true // testBarcode does not exist in table
 
-            connection.query(employeeIDSelectQuery, function(err, result) {
+            connection.query(employeeIDSelectQuery, function(err, result) { // checking that employeeID is in the table
                 if (err) throw err;
                 
                 for (i = 0; i < result.length; i++) {
-                    if (empID === result[i].employeeID) // if the employeeID exists in the Employee Table
+                    console.log("employee id vals: " + result[i].employeeID)
+                    if (empID == result[i].employeeID) // if the employeeID exists in the Employee Table
                         employeeIDValid = true
                 }
-            })
+                console.log("is employeeID in table? " + employeeIDValid)
 
-            console.log("is employeeID in table? " + employeeIDValid)
-            
-            connection.query(testbarcodeSelectQuery, function(err, result) {
-                if (err) throw err;
-                
-                for (i = 0; i < result.length; i++) {
-                    if (testbarcode === result[i].testBarcode) // if the test barcode already exists, 
-                        testbarcodeValid = false
-                }
-            })
-
-            console.log("is testbarcode not in table? " + testbarcodeValid)
-
-            if (selectResult !== null) {
-                insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
-                VALUES (?, ?, NOW(), ?)`;
-
-                // input 2 arrays - one with list of all employeeids and one with all test barcodes
-                // check if test barcode exists (aka non-duplicate)
-
-                values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
-
-                connection.query(insertQuery, values, function (err, result) {
+                connection.query(testbarcodeSelectQuery, function(err, result) { // check that testbarcode is NOT in EmployeeTest
                     if (err) throw err;
-                    console.log("1 record inserted");
+                    
+                    for (i = 0; i < result.length; i++) {
+                        if (testbarcode == result[i].testBarcode) // if the test barcode already exists, set testbarcodeDoesNotExist to false
+                            testbarcodeDoesNotExist = false
+                    }
+                    console.log("is testbarcode not in table? " + testbarcodeDoesNotExist)
+
+                    if (employeeIDValid && testbarcodeDoesNotExist) { // if EmployeeID exists in table and testbarcode is not in EmployeeTest, inesrt new entry into EmployeeTest
+                        insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+                        VALUES (?, ?, NOW(), ?)`;
+
+                        values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
+
+                        connection.query(insertQuery, values, function (err, result) {
+                            if (err) throw err;
+                            console.log("1 record inserted");
+                        });
+                    }
+
+                    else {
+                        console.log("Either EmployeeID is not valid or Testbarcode already exists in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
+                    }
                 });
-                // get last filled row in LabEmployee, and collect 
-            }
-            else {
-                console.log("Employee ID entered was not valid")
-            }
-        }
+            });
+        } // end of try block
 
         catch (e) {
             console.log("could not add")
         }
+
+        
 });
+
+// end of get request for the "add" button
 
 // switch to post request
 app.post("/deleteTestCollection", function(req, res) {
