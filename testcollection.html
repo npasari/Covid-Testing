@@ -117,15 +117,10 @@
         addButton.addEventListener('click', function(e) {
           addRow('dataTable')
           addForm = document.getElementById("addForm")
-          addForm.submit(); // this submits the post request, aka inserting into EmployeeTest Table
+          addForm.submit(); // this submits the get request, aka inserting into EmployeeTest Table
         }); 
 
-        // pull data & send via ajax/jquery post request
-        // global variable for the buttons
-
         deleteButton.addEventListener('click', function(e) {
-              //deleteRow('dataTable')
-
               var testbarcode = ""
 
               try {
@@ -138,7 +133,7 @@
 
                     if (null != radio && true == radio.checked) {
                       testbarcode = row.cells[2].innerHTML
-                      console.log("testbarcode is " + testbarcode)
+                      //console.log("testbarcode is " + testbarcode)
                       table.deleteRow(i);
                       rowCount--;
                       i--;
@@ -147,7 +142,6 @@
                } catch (e) {
                 alert(e)
                }
-
               testbarcodeJSON = '{"msg":"' +testbarcode+ '"}'
 
               $.ajax({
@@ -182,25 +176,6 @@
           cell3.innerHTML = testbarcodeVal;
         }
 
-        function deleteRow(tableID) {
-          try {
-            var table = document.getElementById(tableID);
-            var rowCount = table.rows.length;
-
-            for (var i = 0; i < rowCount; i++) {
-              var row = table.rows[i];
-              var radio = row.cells[0].childNodes[0];
-
-              if (null != radio && true == radio.checked) {
-                table.deleteRow(i);
-                rowCount--;
-                i--;
-              }
-            }
-          } catch (e) {
-            alert(e);
-          }
-        }
   </script>
 
 
