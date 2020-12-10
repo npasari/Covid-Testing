@@ -1,35 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <title>Well Testing</title>
+<title>Student form</title>
 </head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
-</script>
 <style type="text/css">
     h1 {
         text-align: center;
-        padding: 15px;
+        padding: 8px;
         background: #007991;
         background: #D31027;
         background: -webkit-linear-gradient(to right, #EA384D, #D31027);
         background: linear-gradient(to right, #EA384D, #D31027);
         color: black;
         letter-spacing: 0.2rem;
-        margin-bottom: 80px;
+        margin-bottom: 30px;
     }
 
     .wellBar {
-        width: 412px;
-        overflow: hidden;
+        width: 362px;
         margin: 20 0 0 450px;
         padding: 40px;
         background: #9fa2f5;
         border-radius: 15px;
+        position: absolute;
+        left: 180px;
     }
 
+
     #wellBarcode {
-        width: 400px;
+        width: 350px;
         height: 40px;
         border: none;
         border-radius: 3px;
@@ -37,7 +35,7 @@
     }
 
     #poolBarcode {
-        width: 400px;
+        width: 350px;
         height: 40px;
         border: none;
         border-radius: 3px;
@@ -67,8 +65,8 @@
         border-radius: 3px;
         padding-left: 8px;
     }
-
-
+    
+    
     #delete {
         width: 80px;
         height: 30px;
@@ -77,71 +75,126 @@
         padding-left: 8px;
     }
 
-    .abc {
-        border-left: 7px solid #9bdfe8;
-        padding-left: 6px;
-        background-color: #9fa2f5;
-    }
+    .abc{
+            border-left: 7px solid #9bdfe8 ;
+            padding-left: 6px;
+            background-color: #9fa2f5;
+        }
+    .dist{
+            width: 120px;
+            transition: background, 2.0s;
+        }
 
-    .dist {
-        width: 150px;
-        transition: background, 2.0s;
-    }
+    
 </style>
-
 <body>
     <h1>Well Testing</h1>
-    <form>
+    <form id = "addWT" action = '/addWellTesting' method = "get">
         <div class="wellBar">
             <label for="wellBarcode"><b> Well Barcode
                 </b>
             </label><br>
-            <input type="text" name="wellBarcode" id="wellBarcode" placeholder="Well Barcode"><br><br>
+            <input type="text" name="wellB" id="wellBarcode" placeholder="Well Barcode"><br><br>
             <label for="poolBarcode"><b>Pool Barcode
                 </b>
             </label><br>
-            <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode"><br><br>
-            <label for="result"><b>Result:
+            <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode"><br><br>
+            <label for="results"><b>Result:
                 </b>
             </label>
-            <select name="result" id="result">
+            <select name="results" id="results">
                 <option value="inProgress">in-progress</option>
                 <option value="positive">positive</option>
                 <option value="negative">negative</option>
             </select><br><br>
-            <button type="submit" id="add" class="add" onclick="AddData(event)">Add</button><br><br>
+            <button type="submit" id="add" class="add">Add</button><br><br>
         </div>
     </form>
 
     <div id="tab">
         <table id="list" border="1">
-            <thead>
                 <tr>
-                    <td class="abc dist">Well Barcode</td>
-                    <td class="abc dist">Pool Barcode</td>
-                    <td class="abc dist">Results</td>
+                    <th class="abc dist">Select</th>
+                    <th class="abc dist">Well Barcode</th>
+                    <th class="abc dist">Pool Barcode</th>
+                    <th class="abc dist">Results</th>
                 </tr>
-            </thead>
-            <tbody></tbody>
         </table>
     </div>
     <br>
 
-    <button id="edit">Edit</button>
-    <button id="delete">Delete</button>
+    <form id="editWT" action='/editWellTesting' method="get">
+        <input type="submit" id="edit" value="Edit" />
+    </form>
+    <form id="deleteWT" action='/deleteWellTesting' method="get">
+        <input type="submit" id="delete" value="Delete" />
+    </form>
 
-
-
-    <script>
-        function AddData(e) {
-            e.preventDefault();
-            var rows = "";
-            var wellBarcode = document.getElementById("wellBarcode").value;
-            var poolBarcode = document.getElementById("poolBarcode").value;
-            var results = document.getElementById("result").value;
-            rows += "<tr><td>" + wellBarcode + "</td><td>" + poolBarcode + "</td><td>" + results + "</td></tr>";
-            $(rows).appendTo("#list tbody");
-        }
+    <script src="https://code.jQuery.com/jQuery-3.5.1.min.js">
     </script>
 
+    <script>
+        console.log('Client-side code running');
+        const addBtn = document.getElementById('add');
+        // const deleteBtn = document.getElementById('delete');
+
+        addBtn.addEventListener('click', function (e) {
+            addRow('list')
+            addWT = document.getElementById("addWT")
+            addWT.submit(); // this submits the post request, aka inserting into WellTesting Table
+        });
+
+        // deleteBtn.addEventListener('click', function (e) {
+        //     deleteRow('list')
+        //     deleteWT = document.getElementById("deleteWT")
+        //     deleteWT.submit(); // this submits the post request, aka deleting from WellTesting Table
+        // });
+
+        function addRow(tableID) {
+            var table = document.getElementById(tableID);
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount); // inserting a new row at the last slot in the table
+
+            var cell1 = row.insertCell(0); // the four column spaces for the new row
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            cell3.id = "wellBarcodeVal" + rowCount;
+
+            radio = document.createElement("input");
+            radio.setAttribute('type', "radio");
+            radio.id = "radio" + rowCount;
+
+            var wellBarcodeVal = document.getElementById('wellBarcode').value;
+            var poolBarcodeVal = document.getElementById('poolBarcode').value;
+            var resultVal = document.getElementById('results').value;
+
+            cell1.appendChild(radio);
+            cell2.innerHTML = wellBarcodeVal;
+            cell3.innerHTML = poolBarcodeVal;
+            cell4.insertHTML = resultVal;
+        }
+
+        //need to insert code for the EDIT button functioning
+
+        // function deleteRow(tableID) {
+        //     try {
+        //         var table = document.getElementById(tableID);
+        //         var rowCount = table.rows.length;
+
+        //         for (var i = 0; i < rowCount; i++) {
+        //             var row = table.rows[i];
+        //             var radio = row.cells[0].childNodes[0];
+
+        //             if (null != radio && true == radio.checked) {
+        //                 table.deleteRow(i);
+        //                 rowCount--;
+        //                 i--;
+        //             }
+        //         }
+        //     } catch (e) {
+        //         alert(e);
+        //     }
+        // }
+    </script>
 </body>
