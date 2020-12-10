@@ -26,15 +26,19 @@ app.get("/", function (req, res) {
 });
 
 app.get("/labtechLogin", function(req, res){
-    technicianLogin(req, res);
+    //technicianLogin(req, res);
+    res.sendFile(__dirname + '/TechnicianLogin.html')
+
 });
 
 app.get("/labHome", function(req, res){
-    labHome(req, res);
+    //labHome(req, res);
+    res.sendFile(__dirname + '/LabHome.html')
 });
 
 app.get("/employeeLogin", function (req, res) {
-    employeeLogin(req, res);
+    //employeeLogin(req, res);
+    res.sendFile(__dirname + '/EmployeeLogin.html')
 });
 
 app.get("/testCollection", function (req, res) {
@@ -97,8 +101,6 @@ app.get("/addTestCollection", function(req, res) {
             })
 
             console.log("is testbarcode not in table? " + testbarcodeValid)
-
-            
 
             if (selectResult !== null) {
                 insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
@@ -231,6 +233,8 @@ function writeHomePage(req, res) {
     res.write(html);
     res.end();
 }
+
+/*
 
 //Lab Technician Login Page which takes you to the Lab Home
 function technicianLogin(req, res){
@@ -458,6 +462,8 @@ function employeeLogin(req, res) {
     res.write(html);
     res.end();
 }
+
+*/
 
 function employeeResults(req, res){
     let email = req.body.email;
