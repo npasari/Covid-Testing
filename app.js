@@ -179,6 +179,76 @@ app.post("/deleteTestCollection", function(req, res) {
         })
 });
 
+
+
+app.get("/wellTesting", function (req, res) {
+    res.sendFile(__dirname + '/WellTesting.html')
+});
+
+
+app.get("/addWellTesting", function (req, res) {
+    try {
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+
+        var wellbarcode = query.wellB // get WellBarcode from wellBarcode input text in html
+        console.log("well Barcode is " + wellbarcode)
+        var poolbarcode = query.poolB
+        console.log("Pool Barcode is " + poolbarcode) // get pool Barcode from pool Barcode input text in html
+        var employeeResult = query.results
+        console.log("Result is " + employeeResult) // get result from result input text in html
+
+        wellBarcodeSelectQuery = `SELECT wellBarcode FROM well;`;
+        poolcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
+
+        let wellBarcodeDoesNotExist = true // wellBarcode does not exist in table
+        let poolbarcodeExists = false // poolBarcode exists in table
+
+        connection.query(wellBarcodeSelectQuery, function (err, result) { // checking that wellbarcode is not in the table
+            if (err) throw err;
+
+            for (i = 0; i < result.length; i++) {
+                console.log("well barcode vals: " + result[i].wellBarcode)
+                if (wellbarcode == result[i].wellBarcode) // if the wellbarcode exists in the well Table
+                    wellBarcodeDoesNotExist = false
+            }
+            console.log("is wellbarcode in table? " + wellBarcodeDoesNotExist)
+
+            connection.query(poolcodeSelectQuery, function (err, result) { // check that poolbarcode is in the Pool
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the pool barcode already exists, set poolbarcodeExists to true
+                        poolbarcodeExists = true
+                }
+                console.log("is poolbarcode not in table? " + poolbarcodeExists)
+
+                if (wellBarcodeDoesNotExist && poolbarcodeExists) { // if Well Barcode does not exist in table and poolbarcode is in pool, insert new entry 
+                    insertQuery = `INSERT into welltesting (poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result) 
+                        VALUES (?, ?, NOW(), NOW(), ?)`;
+
+                    values = [wellbarcode, poolbarcode, employeeResult]
+
+                    connection.query(insertQuery, values, function (err, result) {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
+                } else {
+                    console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
+                    // DO NOT ADD extra row to the html
+                    // implement extra code
+                }
+            });
+        });
+    } // end of try block
+    catch (e) {
+        console.log("Error could not add")
+    }
+});
+
 //Home page that gives the user two options to choose - Technician Login or Employee Login
 function writeHomePage(req, res) {
     let html = `<!DOCTYPE html>
