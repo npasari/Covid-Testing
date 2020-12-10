@@ -46,16 +46,16 @@ app.get("/testCollection", function (req, res) {
     res.sendFile(__dirname + '/testcollection.html')
 })
 
-app.post("/auth", function (req, res){
+app.get("/auth", function (req, res){
         //res.writeHead(200, { "Content-Type": "text/html" });
-        //let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-        var employeeEmail = req.body.email;
-        //var employeeEmail = query.email;
+        //var employeeEmail = req.body.email;
+        var employeeEmail = query.email;
         console.log("email is " + employeeEmail);
 
-        var password = req.body.email;
-        //var password = query.password;
+        //var password = req.body.email;
+        var password = query.password;
         console.log("password is " + password);
 
         var sql = `SELECT * FROM Employee;`;
@@ -82,16 +82,15 @@ app.post("/auth", function (req, res){
             }
             console.log("is employeeID in table? " + employeeIDValid)
             if(employeeIDValid){
-                res.redirect(__dirname + '/EmployeeResults.html');
-                console.log("success")
+                res.redirect('/EmployeeResults.html');
             }
         });
-        res.end();
+        //res.end();
 })
 
-// app.get("/employeeResults", function(req, res){
-//     res.sendFile(__dirname + '/EmployeeResults.html'); 
-// });
+app.get("/EmployeeResults", function(req, res){
+    res.sendFile(__dirname + '/EmployeeResults.html'); 
+});
 
 app.get("/addTestCollection", function(req, res) {
         try {
