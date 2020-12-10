@@ -82,7 +82,7 @@ app.get("/auth", function (req, res){
              }
              console.log("is employeeID in table? " + employeeIDValid)
              if(employeeIDValid){
-                 res.redirect('/EmployeeResults.html');
+                 res.redirect('/EmployeeResults');
                  res.end();
              }
          });
