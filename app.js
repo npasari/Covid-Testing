@@ -2,8 +2,8 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "72Buggyrides",
-    database: "final",
+    password: "C00ki3M0nst3r",
+    database: "finalprojectschema",
     port: "3306"
 });
 
@@ -46,8 +46,125 @@ app.get("/employeeLogin", function (req, res) {
 });
 
 app.get("/testCollection", function (req, res) {
+    //res.sendFile(__dirname + '/testcollection.html')
+    
+    let html = `
+        <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
 
-    res.sendFile(__dirname + '/testcollection.html')
+        td,
+
+        th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+
+        h1 {
+          text-align: center;
+          padding: 10px;
+          background: #007991;
+          background: #D31027;
+          background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+          background: linear-gradient(to right, #EA384D, #D31027);
+          color: black;
+          letter-spacing: 0.2rem;
+          margin-bottom: 60px;
+        }
+
+        .testCollect {
+          width: 412px;
+          overflow: hidden;
+          margin: auto;
+          margin: 20 0 0 450px;
+          padding: 20px;
+          background: #9fa2f5;
+          border-radius: 15px;
+        }
+      
+
+        #employeeID {
+          width: 400px;
+          height: 40px;
+          border: none;
+          border-radius: 3px;
+          padding-left: 8px;
+        }
+
+        #testbarcode {
+          width: 400px;
+          height: 40px;
+          border: none;
+          border-radius: 3px;
+          padding-left: 8px;
+        }
+
+        #addButton {
+          width: 150px;
+          height: 35px;
+          border: none;
+          border-radius: 3px;
+          padding-left: 8px;
+        }
+
+        #deleteButton {
+          width: 150px;
+          height: 35px;
+          border: none;
+          border-radius: 3px;
+          padding-left: 8px;
+        }
+      </style>
+    </head>
+
+      <body>
+
+        <h1> Test Collection </h1>
+        <div class = "testCollect">
+
+          <form id = "addForm" action = '/addTestCollection' method = "get">
+          <div>
+              <label>Employee ID: </label>
+              <input type="text" name = "eID" id = "employeeID"/>
+          </div>
+          <br>
+          <div>
+              <label>Test Barcode: </label>
+              <input type="text" name = "testB" id = "testbarcode"/>
+          </div>
+        </div>
+
+        <input type="submit" id = "addButton" value="Add"  />
+        </form>
+
+        <button id = "deleteButton" > Delete  </button>
+
+          <table id="dataTable" name = "dataTable" width="350px" border="1">
+            <tr>
+              <th> Select </th>
+              <th> Employee ID </th>
+              <th> Test Barcode </th>
+            </tr>`;
+
+    sqlquery = "SELECT employeeID, testBarcode FROM EmployeeTest"
+
+    connection.query(sqlquery, function(err, result) {
+        if (err) throw err
+        // creating the table with the data from result
+        for (var i = 0; i < result.length; i++) {
+            newRow = `<tr><td><input type="radio" name = "bill" ></td> <td>` + result[i].employeeID + `</td> <td> ` + result[i].testBarcode + `</td> </tr>`;
+            html += newRow
+        }
+        res.write(html + "</table>\n</body>\n</html>")
+        res.end();
+    })
 })
 
 app.get("/poolMapping", function(req, res){
