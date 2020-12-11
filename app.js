@@ -46,15 +46,47 @@ app.get("/testCollection", function (req, res) {
     res.sendFile(__dirname + '/testcollection.html')
 })
 
+app.get("/labAuth", function(req, res){
+    let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+
+         var labID = query.labId;
+         console.log("email is " + labID);
+ 
+         var password = query.password;
+         console.log("password is " + password);
+ 
+         var sql = `SELECT * FROM LabEmployee;`;
+ 
+         let labIDValid = false // employeeID does not exist in table
+ 
+         connection.query(sql, function(err, result){
+             if (err) throw err;
+             var i = 0;
+             while(!labIDValid && i < result.length){
+                 console.log("lab id vals: " + result[i].labID)
+                 console.log(labID);
+                 console.log(result[i].labID);
+                 console.log(password);
+                 console.log(result[i].password);
+                 if (labID == result[i].labID && password == result[i].password){
+                     labIDValid = true
+                 } // if the employeeID exists in the Employee Table
+                 i++;
+             }
+             console.log("is labID in table? " + labIDValid)
+             if(labIDValid){
+                 res.redirect('/LabHome');
+                 res.end();
+             }
+         });
+})
+
 app.get("/auth", function (req, res){
-         //res.writeHead(200, { "Content-Type": "text/html" });
          let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-         //var employeeEmail = req.body.email;
          var employeeEmail = query.email;
          console.log("email is " + employeeEmail);
  
-         //var password = req.body.email;
          var password = query.password;
          console.log("password is " + password);
  
@@ -73,10 +105,6 @@ app.get("/auth", function (req, res){
                  console.log(result[i].passcode);
                  if (employeeEmail == result[i].email && password == result[i].passcode){
                      employeeIDValid = true
-                     // console.log(employeeEmail);
-                     // console.log(result[i].employeeID);
-                     // console.log(password);
-                     // console.log(result[i].passcode);
                  } // if the employeeID exists in the Employee Table
                  i++;
              }
