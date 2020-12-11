@@ -22,6 +22,7 @@ const {
 } = require('assert');
 const { request } = require('http');
 const { response } = require('express');
+const { table } = require('console');
 
 app.get("/", function (req, res) {
     writeHomePage(req, res);
@@ -46,6 +47,10 @@ app.get("/employeeLogin", function (req, res) {
 app.get("/testCollection", function (req, res) {
 
     res.sendFile(__dirname + '/testcollection.html')
+})
+
+app.get("/poolMapping", function(req, res){
+    res.sendFile(__dirname + "/PoolMapping.html");
 })
 
 app.get("/labAuth", function(req, res){
@@ -324,16 +329,321 @@ app.post("/deleteTestCollection", function(req, res) {
 
 
 
-app.get("/wellTesting", function (req, res) {
-    res.sendFile(__dirname + '/WellTesting.html')
-});
+// app.get("/wellTesting", function (req, res) {
+//     res.sendFile(__dirname + '/WellTesting.html')
+// });
 
+/*When you open: 
+The HTML page requests the app.js for the table contents
+   The app.js SELECT queries the SQL Database
+   app.js returns a json to the front end
+Render that json as a table using javascript
+
+Add:
+The HTML page has a form and sends the form results to app.js
+   The app.js inserts the form data into the SQL
+   The app.js SELECT  queries the SQL Database
+   app.js returns a json to the front end
+Render that json as a table using javascript
+
+Delete:
+The HTML page sends which line to delete to app.js
+   The app.js deletes the specified row in the SQL
+   The app.js SELECT  queries the SQL Database
+   app.js returns a json to the front end
+Render that json as a table using javascript
+
+Edit:
+The HTML page sends which line to edit to app.js and what the new status is
+   The app.js UPDATE the specified row to the new status in the SQL
+   The app.js SELECT queries the SQL Database
+   app.js returns a json to the front end
+Render that json */
+
+app.get("/wellTesting", function(req, res){
+    try {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+        let html = `<html>
+        <head>
+        <title>Well Testing</title>
+        </head>
+        <style type="text/css">
+            h1 {
+                text-align: center;
+                padding: 8px;
+                background: #007991;
+                background: #D31027;
+                background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+                background: linear-gradient(to right, #EA384D, #D31027);
+                color: black;
+                letter-spacing: 0.2rem;
+                margin-bottom: 30px;
+            }
+        
+            .wellBar {
+                width: 362px;
+                margin: 20 0 0 450px;
+                padding: 40px;
+                background: #9fa2f5;
+                border-radius: 15px;
+                position: absolute;
+                left: 180px;
+            }
+        
+        
+            #wellBarcode {
+                width: 350px;
+                height: 40px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #poolBarcode {
+                width: 350px;
+                height: 40px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #result {
+                width: 100px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #add {
+                width: 150px;
+                height: 35px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #edit {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+            
+            
+            #delete {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            .abc{
+                    border-left: 7px solid #9bdfe8 ;
+                    padding-left: 6px;
+                    background-color: #9fa2f5;
+                }
+            .dist{
+                    width: 120px;
+                    transition: background, 2.0s;
+                }
+        </style>
+        <body>
+            <h1>Well Testing</h1>
+            <form id = "addWT" action = '/addWellTesting' method = "get">
+                <div class="wellBar">
+                    <label for="wellBarcode"><b> Well Barcode
+                        </b>
+                    </label><br>
+                    <input type="text" name="wellB" id="wellBarcode" placeholder="Well Barcode"><br><br>
+                    <label for="poolBarcode"><b>Pool Barcode
+                        </b>
+                    </label><br>
+                    <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode"><br><br>
+                    <label for="results"><b>Result:
+                        </b>
+                    </label>
+                    <select name="results" id="results">
+                        <option value="inProgress">in-progress</option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                    </select><br><br>
+                    <button type="submit" id="add" class="add">Add</button><br><br>
+                </div>
+            </form>
+        
+            <div id="tab">
+                <table id="list" border="1">
+                        <tr>
+                            <th class="abc dist">Select</th>
+                            <th class="abc dist">Well Barcode</th>
+                            <th class="abc dist">Pool Barcode</th>
+                            <th class="abc dist">Results</th>
+                        </tr>
+                        <tr></tr>
+                </table>
+            </div>
+            <br>
+        
+            <form id="editWT" action='/editWellTesting' method="get">
+                <input type="submit" id="edit" value="Edit" />
+            </form>
+            <form id="deleteWT" action='/deleteWellTesting' method="get">
+                <input type="submit" id="delete" value="Delete" />
+            </form>`;
+            connection.query(constructSQLWellCommand(), function(err, results){
+                if(err) throw err;
+                html.replace("<tr></tr>", writeWellTable(results))
+                res.write(html + "\n\n</body>\n</html>");
+                res.end();
+            });
+    } // end of try block
+    catch (e) {
+        console.log("could not add");
+    }
+
+});
 
 app.get("/addWellTesting", function (req, res) {
     try {
         res.writeHead(200, {
             "Content-Type": "text/html"
         });
+
+        let html = `<html>
+        <head>
+        <title>Well Testing</title>
+        </head>
+        <style type="text/css">
+            h1 {
+                text-align: center;
+                padding: 8px;
+                background: #007991;
+                background: #D31027;
+                background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+                background: linear-gradient(to right, #EA384D, #D31027);
+                color: black;
+                letter-spacing: 0.2rem;
+                margin-bottom: 30px;
+            }
+        
+            .wellBar {
+                width: 362px;
+                margin: 20 0 0 450px;
+                padding: 40px;
+                background: #9fa2f5;
+                border-radius: 15px;
+                position: absolute;
+                left: 180px;
+            }
+        
+        
+            #wellBarcode {
+                width: 350px;
+                height: 40px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #poolBarcode {
+                width: 350px;
+                height: 40px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #result {
+                width: 100px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #add {
+                width: 150px;
+                height: 35px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #edit {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+            
+            
+            #delete {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            .abc{
+                    border-left: 7px solid #9bdfe8 ;
+                    padding-left: 6px;
+                    background-color: #9fa2f5;
+                }
+            .dist{
+                    width: 120px;
+                    transition: background, 2.0s;
+                }
+        </style>
+        <body>
+            <h1>Well Testing</h1>
+            <form id = "addWT" action = '/addWellTesting' method = "get">
+                <div class="wellBar">
+                    <label for="wellBarcode"><b> Well Barcode
+                        </b>
+                    </label><br>
+                    <input type="text" name="wellB" id="wellBarcode" placeholder="Well Barcode"><br><br>
+                    <label for="poolBarcode"><b>Pool Barcode
+                        </b>
+                    </label><br>
+                    <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode"><br><br>
+                    <label for="results"><b>Result:
+                        </b>
+                    </label>
+                    <select name="results" id="results">
+                        <option value="inProgress">in-progress</option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                    </select><br><br>
+                    <button type="submit" id="add" class="add">Add</button><br><br>
+                </div>
+            </form>
+        
+            <div id="tab">
+                <table id="list" border="1">
+                        <tr>
+                            <th class="abc dist">Select</th>
+                            <th class="abc dist">Well Barcode</th>
+                            <th class="abc dist">Pool Barcode</th>
+                            <th class="abc dist">Results</th>
+                        </tr>
+                        <tr></tr>
+                </table>
+            </div>
+            <br>
+        
+            <form id="editWT" action='/editWellTesting' method="get">
+                <input type="submit" id="edit" value="Edit" />
+            </form>
+            <form id="deleteWT" action='/deleteWellTesting' method="get">
+                <input type="submit" id="delete" value="Delete" />
+            </form>`;
+
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
         var wellbarcode = query.wellB // get WellBarcode from wellBarcode input text in html
@@ -343,54 +653,108 @@ app.get("/addWellTesting", function (req, res) {
         var employeeResult = query.results
         console.log("Result is " + employeeResult) // get result from result input text in html
 
-        wellBarcodeSelectQuery = `SELECT wellBarcode FROM well;`;
-        poolcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
+        // let sqlQuery = `INSERT INTO Well(wellBarcode) VALUES ('` + wellbarcode + `')`;
+        // // INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
+        // // VALUES ('` + poolbarcode + `', SELECT wellBarcode from Well WHERE type = '` + wellbarcode + `', 
+        // // GETDATE(), GETDATE(), '` + results + `')`;
+        // console.log(sqlQuery);
+        // //values = [wellbarcode];
+        // connection.query(sqlQuery, function(err, results){
+        //     if(err) throw err;
+        // });
+        
+        // INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
+        // VALUES ('BCD', (SELECT wellBarcode from Well WHERE wellBarcode = '234'), 
+		// CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'InProgress');
+        sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
+        VALUES ('SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolBarcode + `', 
+        SELECT wellBarcode from Well WHERE wellBarcode = '` + wellBarcode + `', 
+        CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
+        //console.log(sqlQuery);
+        connection.query(sqlQuery, function(err, results){
+            if(err) throw err;
+        });
 
-        let wellBarcodeDoesNotExist = true // wellBarcode does not exist in table
-        let poolbarcodeExists = false // poolBarcode exists in table
+        // wellBarcodeSelectQuery = `SELECT wellBarcode FROM well;`;
+        // poolcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
 
-        connection.query(wellBarcodeSelectQuery, function (err, result) { // checking that wellbarcode is not in the table
-            if (err) throw err;
+        // let wellBarcodeDoesNotExist = true // wellBarcode does not exist in table
+        // let poolbarcodeExists = false // poolBarcode exists in table
 
-            for (i = 0; i < result.length; i++) {
-                console.log("well barcode vals: " + result[i].wellBarcode)
-                if (wellbarcode == result[i].wellBarcode) // if the wellbarcode exists in the well Table
-                    wellBarcodeDoesNotExist = false
-            }
-            console.log("is wellbarcode in table? " + wellBarcodeDoesNotExist)
+        // connection.query(wellBarcodeSelectQuery, function (err, result) { // checking that wellbarcode is not in the table
+        //     if (err) throw err;
 
-            connection.query(poolcodeSelectQuery, function (err, result) { // check that poolbarcode is in the Pool
-                if (err) throw err;
+        //     for (i = 0; i < result.length; i++) {
+        //         console.log("well barcode vals: " + result[i].wellBarcode)
+        //         if (wellbarcode == result[i].wellBarcode) // if the wellbarcode exists in the well Table
+        //             wellBarcodeDoesNotExist = false
+        //     }
+        //     console.log("is wellbarcode in table? " + wellBarcodeDoesNotExist)
 
-                for (i = 0; i < result.length; i++) {
-                    console.log("pool barcode vals: " + result[i].poolBarcode)
-                    if (poolbarcode == result[i].poolBarcode) // if the pool barcode already exists, set poolbarcodeExists to true
-                        poolbarcodeExists = true
-                }
-                console.log("is poolbarcode not in table? " + poolbarcodeExists)
+        //     connection.query(poolcodeSelectQuery, function (err, result) { // check that poolbarcode is in the Pool
+        //         if (err) throw err;
 
-                if (wellBarcodeDoesNotExist && poolbarcodeExists) { // if Well Barcode does not exist in table and poolbarcode is in pool, insert new entry 
-                    insertQuery = `INSERT into welltesting (poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result) 
-                        VALUES (?, ?, NOW(), NOW(), ?)`;
+        //         for (i = 0; i < result.length; i++) {
+        //             console.log("pool barcode vals: " + result[i].poolBarcode)
+        //             if (poolbarcode == result[i].poolBarcode) // if the pool barcode already exists, set poolbarcodeExists to true
+        //                 poolbarcodeExists = true
+        //         }
+        //         console.log("is poolbarcode not in table? " + poolbarcodeExists)
 
-                    values = [wellbarcode, poolbarcode, employeeResult]
+        //         if (wellBarcodeDoesNotExist && poolbarcodeExists) {
+        //             let sql = `INSERT INTO Well VALUES (wellbarcode);` // if Well Barcode does not exist in table and poolbarcode is in pool, insert new entry 
+        //             let insertQuery = `INSERT into welltesting (poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result) 
+        //                 VALUES (?, ?, NOW(), NOW(), ?)`;
 
-                    connection.query(insertQuery, values, function (err, result) {
-                        if (err) throw err;
-                        console.log("1 record inserted");
-                    });
-                } else {
-                    console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
-                    // DO NOT ADD extra row to the html
-                    // implement extra code
-                }
-            });
+        //             values = [wellbarcode, poolbarcode, employeeResult]
+
+        //             connection.query(sql, function(err, result){
+        //                 if(err) throw err;
+        //                 console.log("1 record inserted.")
+        //             })
+
+        //             connection.query(insertQuery, values, function (err, result) {
+        //                 if (err) throw err;
+        //                 console.log("1 record inserted");
+        //             });
+        //         } else {
+        //             console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
+        //             // DO NOT ADD extra row to the html
+        //             // implement extra code
+        //         }
+        //     });
+        // });
+        connection.query(constructSQLWellCommand(), function(err, results){
+            if(err) throw err;
+            html.replace("<tr></tr>", writeWellTable(results))
+            res.write(html + "\n\n</body>\n</html>");
+            res.end();
         });
     } // end of try block
     catch (e) {
         console.log("Error could not add")
     }
 });
+
+function constructSQLWellCommand(){
+    var sql = `SELECT * FROM WellTesting W1, Well W
+                WHERE W.wellBarcode = W1.wellBarcodeFK;`;
+    return sql;
+};
+
+// Updates the Well Testing HTML table dependent on the queries made to the database
+function writeWellTable(SQLResult){
+    let tableStr = "";
+    for(let item of SQLResult){
+        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK +"\"></td>" +
+        "<td> " + item.wellBarcodeFK + " </td>" +
+        "<td> " + item.poolBarcodeFK + " </td>" +
+        "<td> " + item.result + "</td>" +
+        "</tr>";
+    }
+    return tableStr;
+
+}
 
 //Home page that gives the user two options to choose - Technician Login or Employee Login
 function writeHomePage(req, res) {
