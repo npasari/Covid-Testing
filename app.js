@@ -97,6 +97,8 @@ app.get("/auth", function (req, res){
          console.log("password is " + password);
  
          var sql = `SELECT * FROM Employee;`;
+
+         var employeeID = "";
  
          let employeeIDValid = false // employeeID does not exist in table
  
@@ -111,12 +113,13 @@ app.get("/auth", function (req, res){
                  console.log(result[i].passcode);
                  if (employeeEmail == result[i].email && password == result[i].passcode){
                      employeeIDValid = true
+                     employeeID = result[i].employeeID;
                  } // if the employeeID exists in the Employee Table
                  i++;
              }
              console.log("is employeeID in table? " + employeeIDValid)
              if(employeeIDValid){
-                 res.cookie('employeeEmail', employeeEmail);
+                 res.cookie('employeeID', employeeID);
                  res.redirect('/EmployeeResults');
                  res.end();
              } else {
@@ -135,7 +138,101 @@ app.get("/LabErrorPage", function(req, res){
 })
 
 app.get("/EmployeeResults", function(req, res){
-    res.sendFile(__dirname + '/EmployeeResults.html'); 
+    try {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+        let html = `<!DOCTYPE html>
+        <html lang = "en">
+        <head>
+        <title>Employee Results</title>
+        <style type="text/css">
+        h1{  
+            text-align: center;  
+            padding: 20px;  
+            background: #007991;
+            background: #D31027;
+            background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+            background: linear-gradient(to right, #EA384D, #D31027);
+            color: black;
+            letter-spacing: 0.2rem;
+            margin-bottom:90px;
+        }  
+        
+        .empLogin{  
+            width: 412px;  
+            overflow: hidden;  
+            margin: auto;  
+            margin: 20 0 0 450px;  
+            padding: 80px;  
+            background: #9fa2f5;  
+            border-radius: 15px ;  
+        }  
+        
+        #email{  
+            width: 400px;  
+            height: 50px;  
+            border: none;  
+            border-radius: 3px;  
+            padding-left: 8px;  
+        }  
+        
+        #pass{
+            width: 400px;  
+            height: 50px;  
+            border: none;  
+            border-radius: 3px;  
+            padding-left: 8px;  
+              
+        }
+        
+        #login{  
+            width: 400px;  
+            height: 50px;  
+            border: none;  
+            border-radius: 17px;  
+            padding-left: 7px;  
+            color: blue; 
+        }  
+        span{   
+            font-size: 17px;  
+        }  
+    
+        </style>
+        </head>
+        <body>
+            <h1>Employee Testing Results</h1>
+            <table>
+            <tr>
+                <th>Collection Date</th>
+                <th>Result</th>
+            </tr>
+            </table>`;
+        var employeeID = req.cookies['employeeID'];
+        console.log(employeeID);
+        let sql = `SELECT E1.collectionTime, W.result FROM 
+        Employee E, EmployeeTest E1, WellTesting W, PoolMap P, Pool P1 WHERE 
+        E.employeeID = E1.employeeID AND E.employeeID = '%${employeeID}%' 
+        AND E1.testBarcode = P.testBarcode AND
+        P.poolBarcode = P1.poolBarcode AND P1.poolBarcode = W.poolBarcodeFK;`
+        console.log(employeeID);
+        let html1 = '';
+        connection.query(sql, function(err, result){
+            if(err) throw err;
+            for(let item of result){
+                html1 += `
+                <pre>
+                    <tr>
+                    <td> ` + item.collectionTime + ` </td>
+                    <td> ` + item.result + ` </td></pre>`;
+            }
+            html.replace("<td>No Test</td>", html1);
+            res.write(html + "\n\n</body>\n</html>");
+        });
+
+    } catch (e) {
+        console.log("could not get EmployeeResults")
+    }
+    //res.sendFile(__dirname + '/EmployeeResults.html'); 
 });
 
 app.get("/addTestCollection", function(req, res) {
