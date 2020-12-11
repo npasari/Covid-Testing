@@ -23,6 +23,7 @@ const {
 const { request } = require('http');
 const { response } = require('express');
 const { table } = require('console');
+const { write } = require('fs');
 
 app.get("/", function (req, res) {
     writeHomePage(req, res);
@@ -496,7 +497,9 @@ app.get("/wellTesting", function(req, res){
             </form>`;
             connection.query(constructSQLWellCommand(), function(err, results){
                 if(err) throw err;
-                html.replace("<tr></tr>", writeWellTable(results))
+                let arr = writeWellTable(results);
+                //console.log(arr);
+                html = html.replace("<tr></tr>", arr)
                 res.write(html + "\n\n</body>\n</html>");
                 res.end();
             });
@@ -509,9 +512,9 @@ app.get("/wellTesting", function(req, res){
 
 app.get("/addWellTesting", function (req, res) {
     try {
-        res.writeHead(200, {
-            "Content-Type": "text/html"
-        });
+        // res.writeHead(200, {
+        //     "Content-Type": "text/html"
+        // });
 
         let html = `<html>
         <head>
@@ -632,7 +635,6 @@ app.get("/addWellTesting", function (req, res) {
                             <th class="abc dist">Pool Barcode</th>
                             <th class="abc dist">Results</th>
                         </tr>
-                        <tr></tr>
                 </table>
             </div>
             <br>
@@ -653,81 +655,78 @@ app.get("/addWellTesting", function (req, res) {
         var employeeResult = query.results
         console.log("Result is " + employeeResult) // get result from result input text in html
 
+        //inserts into the well table first
         // let sqlQuery = `INSERT INTO Well(wellBarcode) VALUES ('` + wellbarcode + `')`;
-        // // INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
-        // // VALUES ('` + poolbarcode + `', SELECT wellBarcode from Well WHERE type = '` + wellbarcode + `', 
-        // // GETDATE(), GETDATE(), '` + results + `')`;
         // console.log(sqlQuery);
-        // //values = [wellbarcode];
         // connection.query(sqlQuery, function(err, results){
         //     if(err) throw err;
         // });
         
-        // INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
-        // VALUES ('BCD', (SELECT wellBarcode from Well WHERE wellBarcode = '234'), 
-		// CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'InProgress');
-        sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
-        VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
-        (SELECT wellBarcode from Well WHERE wellBarcode = '` + wellbarcode + `'), 
-        CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
-
-        connection.query(sqlQuery, function(err, results){
-            if(err) throw err;
-        });
-
-        // wellBarcodeSelectQuery = `SELECT wellBarcode FROM well;`;
-        // poolcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
-
-        // let wellBarcodeDoesNotExist = true // wellBarcode does not exist in table
-        // let poolbarcodeExists = false // poolBarcode exists in table
-
-        // connection.query(wellBarcodeSelectQuery, function (err, result) { // checking that wellbarcode is not in the table
-        //     if (err) throw err;
-
-        //     for (i = 0; i < result.length; i++) {
-        //         console.log("well barcode vals: " + result[i].wellBarcode)
-        //         if (wellbarcode == result[i].wellBarcode) // if the wellbarcode exists in the well Table
-        //             wellBarcodeDoesNotExist = false
-        //     }
-        //     console.log("is wellbarcode in table? " + wellBarcodeDoesNotExist)
-
-        //     connection.query(poolcodeSelectQuery, function (err, result) { // check that poolbarcode is in the Pool
-        //         if (err) throw err;
-
-        //         for (i = 0; i < result.length; i++) {
-        //             console.log("pool barcode vals: " + result[i].poolBarcode)
-        //             if (poolbarcode == result[i].poolBarcode) // if the pool barcode already exists, set poolbarcodeExists to true
-        //                 poolbarcodeExists = true
-        //         }
-        //         console.log("is poolbarcode not in table? " + poolbarcodeExists)
-
-        //         if (wellBarcodeDoesNotExist && poolbarcodeExists) {
-        //             let sql = `INSERT INTO Well VALUES (wellbarcode);` // if Well Barcode does not exist in table and poolbarcode is in pool, insert new entry 
-        //             let insertQuery = `INSERT into welltesting (poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result) 
-        //                 VALUES (?, ?, NOW(), NOW(), ?)`;
-
-        //             values = [wellbarcode, poolbarcode, employeeResult]
-
-        //             connection.query(sql, function(err, result){
-        //                 if(err) throw err;
-        //                 console.log("1 record inserted.")
-        //             })
-
-        //             connection.query(insertQuery, values, function (err, result) {
-        //                 if (err) throw err;
-        //                 console.log("1 record inserted");
-        //             });
-        //         } else {
-        //             console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
-        //             // DO NOT ADD extra row to the html
-        //             // implement extra code
-        //         }
-        //     });
+        // //inserts into the wellTesting table
+        // sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
+        // VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
+        // (SELECT wellBarcode from Well WHERE wellBarcode = '` + wellbarcode + `'), 
+        // CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
+        // connection.query(sqlQuery, function(err, results){
+        //     if(err) throw err;
         // });
+
+        wellBarcodeSelectQuery = `SELECT wellBarcode FROM well;`;
+        poolcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
+
+        let wellBarcodeDoesNotExist = true // wellBarcode does not exist in table
+        let poolbarcodeExists = false // poolBarcode exists in table
+
+        connection.query(wellBarcodeSelectQuery, function (err, result) { // checking that wellbarcode is not in the table
+            if (err) throw err;
+
+            for (i = 0; i < result.length; i++) {
+                console.log("well barcode vals: " + result[i].wellBarcode)
+                if (wellbarcode == result[i].wellBarcode) // if the wellbarcode exists in the well Table
+                    wellBarcodeDoesNotExist = false
+            }
+            console.log("is wellbarcode in table? " + wellBarcodeDoesNotExist)
+
+            connection.query(poolcodeSelectQuery, function (err, result) { // check that poolbarcode is in the Pool
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the pool barcode already exists, set poolbarcodeExists to true
+                        poolbarcodeExists = true
+                }
+                console.log("is poolbarcode not in table? " + poolbarcodeExists)
+
+                if (wellBarcodeDoesNotExist && poolbarcodeExists) {
+                    //inserts into the well table first
+                    let sqlQuery = `INSERT INTO Well(wellBarcode) VALUES ('` + wellbarcode + `')`;
+                    console.log(sqlQuery);
+                    connection.query(sqlQuery, function(err, results){
+                        if(err) throw err;
+                    });
+                    
+                    //inserts into the wellTesting table
+                    sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
+                    VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
+                    (SELECT wellBarcode from Well WHERE wellBarcode = '` + wellbarcode + `'), 
+                    CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
+                    connection.query(sqlQuery, function(err, results){
+                        if(err) throw err;
+                    });
+                } else {
+                    console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
+                    // DO NOT ADD extra row to the html
+                    // implement extra code
+                }
+            });
+        });
         connection.query(constructSQLWellCommand(), function(err, results){
             if(err) throw err;
-            html.replace("<tr></tr>", writeWellTable(results))
-            res.write(html + "\n\n</body>\n</html>");
+            let arr = writeWellTable(results);
+            //html = html.replace("</table>", writeWellTable(results));
+            console.log(arr);
+            //res.write(html + "</table>\n\n</body>\n</html>");
+            res.redirect('/wellTesting')
             res.end();
         });
     } // end of try block
@@ -744,14 +743,24 @@ function constructSQLWellCommand(){
 
 // Updates the Well Testing HTML table dependent on the queries made to the database
 function writeWellTable(SQLResult){
+    console.log(SQLResult);
     let tableStr = "";
+    // `<table id="list" border="1">
+    // <tr>
+    //     <th class="abc dist">Select</th>
+    //     <th class="abc dist">Well Barcode</th>
+    //     <th class="abc dist">Pool Barcode</th>
+    //     <th class="abc dist">Results</th>
+    // </tr>`;
     for(let item of SQLResult){
         tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK +"\"></td>" +
         "<td> " + item.wellBarcodeFK + " </td>" +
         "<td> " + item.poolBarcodeFK + " </td>" +
-        "<td> " + item.result + "</td>" +
+        "<td> " + item.result + " </td>" +
         "</tr>";
     }
+    //tableStr += "</table>"
+    console.log(tableStr);
     return tableStr;
 
 }
