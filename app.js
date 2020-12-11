@@ -11,9 +11,11 @@ const express = require('express');
 ////const path = require('path');
 var session = require('express-session');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 const url = require('url');
 const {
     strict
@@ -75,9 +77,13 @@ app.get("/labAuth", function(req, res){
              }
              console.log("is labID in table? " + labIDValid)
              if(labIDValid){
+                 res.cookie('labID', labID);
                  res.redirect('/LabHome');
                  res.end();
-             }
+             } else {
+                res.redirect('/LabErrorPage');
+                res.end();
+            }
          });
 })
 
@@ -110,10 +116,22 @@ app.get("/auth", function (req, res){
              }
              console.log("is employeeID in table? " + employeeIDValid)
              if(employeeIDValid){
+                 res.cookie('employeeEmail', employeeEmail);
                  res.redirect('/EmployeeResults');
+                 res.end();
+             } else {
+                 res.redirect('/EmployeeErrorPage');
                  res.end();
              }
          });
+})
+
+app.get("/EmployeeErrorPage", function(req, res){
+    res.sendFile(__dirname + '/EmployeeErrorPage.html');
+})
+
+app.get("/LabErrorPage", function(req, res){
+    res.sendFile(__dirname + "/LabErrorPage.html");
 })
 
 app.get("/EmployeeResults", function(req, res){
