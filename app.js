@@ -667,10 +667,10 @@ app.get("/addWellTesting", function (req, res) {
         // VALUES ('BCD', (SELECT wellBarcode from Well WHERE wellBarcode = '234'), 
 		// CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), 'InProgress');
         sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
-        VALUES ('SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolBarcode + `', 
-        SELECT wellBarcode from Well WHERE wellBarcode = '` + wellBarcode + `', 
+        VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
+        (SELECT wellBarcode from Well WHERE wellBarcode = '` + wellbarcode + `'), 
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
-        //console.log(sqlQuery);
+
         connection.query(sqlQuery, function(err, results){
             if(err) throw err;
         });
