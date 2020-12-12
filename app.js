@@ -894,25 +894,25 @@ app.get("/addPoolMapping", function (req, res) {
         
         var testbarcode2 = query.testB2
         console.log("Test Barcode is " + testbarcode2) // get test Barcode from test Barcode input text in html
-        if(testbarcode2 != null){
+        if(testbarcode2 != ""){
             count++;
         }
 
         var testbarcode3 = query.testB3
         console.log("Test Barcode is " + testbarcode3) // get test Barcode from test Barcode input text in html
-        if(testbarcode3 != null){
+        if(testbarcode3 != ""){
             count++;
         }
         
         var testbarcode4 = query.testB4
         console.log("Test Barcode is " + testbarcode4) // get test Barcode from test Barcode input text in html
-        if(testbarcode4 != null){
+        if(testbarcode4 != ""){
             count++;
         }
         
         var testbarcode5 = query.testB5
         console.log("Test Barcode is " + testbarcode5) // get test Barcode from test Barcode input text in html
-        if(testbarcode5 != null){
+        if(testbarcode5 != ""){
             count++;
         }
         console.log(count) //count for how many are not null
@@ -922,54 +922,321 @@ app.get("/addPoolMapping", function (req, res) {
 
         let poolBarcodeDoesNotExist = true // poolBarcode does not exist in table
         let testbarcodeExists = false // testBarcode exists in table
-
-        connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
-            if (err) throw err;
-
-            for (i = 0; i < result.length; i++) {
-                console.log("pool barcode vals: " + result[i].poolBarcode)
-                if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
-                    poolBarcodeDoesNotExist = false
-            }
-            console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-            if(count==1){
-            connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+     
+        if(count==1){
+            connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
                 if (err) throw err;
-
+    
                 for (i = 0; i < result.length; i++) {
-                    console.log("test barcode vals: " + result[i].testBarcode)
-                    if (testbarcode == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
-                        testbarcodeExists = true
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                        poolBarcodeDoesNotExist = false
                 }
-                console.log("is testbarcode not in table? " + testbarcodeExists)
+                console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+            
+                connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                    if (err) throw err;
 
-                if (poolBarcodeDoesNotExist && testbarcodeExists) {
-                    //inserts into the pool table first
-                    let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
-                    console.log(sqlQuery);
-                    connection.query(sqlQuery, function(err, results){
-                        if(err) throw err;
+                    for (i = 0; i < result.length; i++) {
+                        console.log("test barcode vals: " + result[i].testBarcode)
+                        if (testbarcode1 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                            testbarcodeExists = true
+                    }
+                    console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                    if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                        //inserts into the pool table first
+                        let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                        console.log(sqlQuery);
+                        connection.query(sqlQuery, function(err, results){
+                            if(err) throw err;
+                        });
+                        
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                        (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                        connection.query(sqlQuery, function(err, results){
+                            if(err) throw err;
+                        });
+                    } else {
+                        console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
+                        }
                     });
-                    
-                    //inserts into the poolMapping table
-                    sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
-                    VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode + `'), 
-                    (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                    connection.query(sqlQuery, function(err, results){
-                        if(err) throw err;
+                });
+            }
+            
+            //count =2
+            if(count==2){
+                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                    if (err) throw err;
+        
+                    for (i = 0; i < result.length; i++) {
+                        console.log("pool barcode vals: " + result[i].poolBarcode)
+                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                            poolBarcodeDoesNotExist = false
+                    }
+                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+                
+                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                        if (err) throw err;
+    
+                        for (i = 0; i < result.length; i++) {
+                            console.log("test barcode vals: " + result[i].testBarcode)
+                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                                testbarcodeExists = true
+                        }
+                        console.log("is testbarcode not in table? " + testbarcodeExists)
+    
+                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                            //inserts into the pool table first
+                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                            console.log(sqlQuery);
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+                            
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+                        } else {
+                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                            // DO NOT ADD extra row to the html
+                            // implement extra code
+                            }
+                        });
                     });
-                } else {
-                    console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
-                    // DO NOT ADD extra row to the html
-                    // implement extra code
                 }
-            });
-        }
+        
+            //count =3
+            if(count==3){
+                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                    if (err) throw err;
+        
+                    for (i = 0; i < result.length; i++) {
+                        console.log("pool barcode vals: " + result[i].poolBarcode)
+                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                            poolBarcodeDoesNotExist = false
+                    }
+                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+                
+                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                        if (err) throw err;
     
+                        for (i = 0; i < result.length; i++) {
+                            console.log("test barcode vals: " + result[i].testBarcode)
+                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                                testbarcodeExists = true
+                        }
+                        console.log("is testbarcode not in table? " + testbarcodeExists)
     
-    }); 
-    }catch(e){
-            console.log("did not add pool mapping");
+                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                            //inserts into the pool table first
+                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                            console.log(sqlQuery);
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+                            
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                        } else {
+                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                            // DO NOT ADD extra row to the html
+                            // implement extra code
+                            }
+                        });
+                    });
+                }
+            //count =4
+            if(count==4){
+                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                    if (err) throw err;
+        
+                    for (i = 0; i < result.length; i++) {
+                        console.log("pool barcode vals: " + result[i].poolBarcode)
+                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                            poolBarcodeDoesNotExist = false
+                    }
+                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+                
+                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                        if (err) throw err;
+    
+                        for (i = 0; i < result.length; i++) {
+                            console.log("test barcode vals: " + result[i].testBarcode)
+                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                                testbarcodeExists = true
+                        }
+                        console.log("is testbarcode not in table? " + testbarcodeExists)
+    
+                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                            //inserts into the pool table first
+                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                            console.log(sqlQuery);
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+                            
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode4 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                        } else {
+                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                            // DO NOT ADD extra row to the html
+                            // implement extra code
+                            }
+                        });
+                    });
+                }
+
+            //count =5
+            if(count==5){
+                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                    if (err) throw err;
+        
+                    for (i = 0; i < result.length; i++) {
+                        console.log("pool barcode vals: " + result[i].poolBarcode)
+                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                            poolBarcodeDoesNotExist = false
+                    }
+                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+                
+                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                        if (err) throw err;
+    
+                        for (i = 0; i < result.length; i++) {
+                            console.log("test barcode vals: " + result[i].testBarcode)
+                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode || testbarcode5 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                                testbarcodeExists = true
+                        }
+                        console.log("is testbarcode not in table? " + testbarcodeExists)
+    
+                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                            //inserts into the pool table first
+                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                            console.log(sqlQuery);
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+                            
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode4 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                            //inserts into the poolMapping table
+                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode5 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                            connection.query(sqlQuery, function(err, results){
+                                if(err) throw err;
+                            });
+
+                        } else {
+                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                            // DO NOT ADD extra row to the html
+                            // implement extra code
+                            }
+                        });
+                    });
+                }
+            res.redirect('/poolMapping')
+            res.end();
+        }catch(e){
+                console.log("did not add pool mapping");
         }
 });
 
