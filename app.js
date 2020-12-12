@@ -656,20 +656,17 @@ app.get("/poolMapping", function(req, res){
             span {
                 font-size: 17px;
             }
-        
-            table { 
-                    margin: 25px 0; 
-                    width: 200px; 
-                } 
-          
-            table th, table td { 
-                padding: 10px; 
-                text-align: center; 
-            } 
-          
-            table, th, td { 
-                border: 1px solid; 
-            } 
+
+            .abc{
+                border-left: 7px solid #9bdfe8 ;
+                padding-left: 6px;
+                background-color: #9fa2f5;
+            }
+
+            .dist{
+                width: 120px;
+                transition: background, 2.0s;
+            }
         </style>
         
         <body>
@@ -684,8 +681,12 @@ app.get("/poolMapping", function(req, res){
                     <label for="testBarcodes"><b>Test Barcodes</b></label><br>
                     <div id="test">
                         <div class="input_field">
-                            <input type="text" name="testB" id="testBarcode" placeholder="Test Barcode" required>
-                            <button id= "deleteTest">delete</button><br><br>    
+                            <input type="text" name="testB1" class="testBarcode" placeholder="Test Barcode" required>
+                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional" >
+                            <br><br>    
                         </div>
                     </div><br>
                     <button id= "addTest">Add Barcode</button><br><br>
@@ -696,8 +697,9 @@ app.get("/poolMapping", function(req, res){
             <table class="displaytable" id="tablecodes">
                 <thead>
                     <tr>
-                        <th>Pool Barcode</th>
-                        <th>Test Barcodes</th>
+                        <th class="abc dist">Select</th>
+                        <th class="abc dist">Pool Barcode</th>
+                        <th class="abc dist">Test Barcodes</th>
                     </tr>
                 </thead>
                 <tr></tr>
@@ -829,20 +831,17 @@ app.get("/addPoolMapping", function (req, res) {
             span {
                 font-size: 17px;
             }
-        
-            table { 
-                    margin: 25px 0; 
-                    width: 200px; 
-                } 
-          
-            table th, table td { 
-                padding: 10px; 
-                text-align: center; 
-            } 
-          
-            table, th, td { 
-                border: 1px solid; 
-            } 
+
+            .abc{
+                border-left: 7px solid #9bdfe8 ;
+                padding-left: 6px;
+                background-color: #9fa2f5;
+            }
+
+            .dist{
+                width: 120px;
+                transition: background, 2.0s;
+            }
         </style>
         
         <body>
@@ -857,8 +856,12 @@ app.get("/addPoolMapping", function (req, res) {
                     <label for="testBarcodes"><b>Test Barcodes</b></label><br>
                     <div id="test">
                         <div class="input_field">
-                            <input type="text" name="testB" id="testBarcode" placeholder="Test Barcode" required>
-                            <button id= "deleteTest">delete</button><br><br>    
+                            <input type="text" name="testB1" class="testBarcode" placeholder="Test Barcode" required>
+                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional" >
+                            <br><br>    
                         </div>
                     </div><br>
                     <button id= "addTest">Add Barcode</button><br><br>
@@ -869,8 +872,9 @@ app.get("/addPoolMapping", function (req, res) {
             <table class="displaytable" id="tablecodes">
                 <thead>
                     <tr>
-                        <th>Pool Barcode</th>
-                        <th>Test Barcodes</th>
+                        <th class="abc dist">Select</th>
+                        <th class="abc dist">Pool Barcode</th>
+                        <th class="abc dist">Test Barcodes</th>
                     </tr>
                 </thead>
                 <tr></tr>
@@ -882,9 +886,36 @@ app.get("/addPoolMapping", function (req, res) {
 
         var poolbarcode = query.poolB // get PoolBarcode from poolBarcode input text in html
         console.log("Pool Barcode is " + poolbarcode)
-        var testbarcode = query.testB
-        console.log("Test Barcode is " + testbarcode) // get test Barcode from test Barcode input text in html
         
+        var count=1;
+        
+        var testbarcode1 = query.testB1
+        console.log("Test Barcode is " + testbarcode1) // get test Barcode from test Barcode input text in html
+        
+        var testbarcode2 = query.testB2
+        console.log("Test Barcode is " + testbarcode2) // get test Barcode from test Barcode input text in html
+        if(testbarcode2 != null){
+            count++;
+        }
+
+        var testbarcode3 = query.testB3
+        console.log("Test Barcode is " + testbarcode3) // get test Barcode from test Barcode input text in html
+        if(testbarcode3 != null){
+            count++;
+        }
+        
+        var testbarcode4 = query.testB4
+        console.log("Test Barcode is " + testbarcode4) // get test Barcode from test Barcode input text in html
+        if(testbarcode4 != null){
+            count++;
+        }
+        
+        var testbarcode5 = query.testB5
+        console.log("Test Barcode is " + testbarcode5) // get test Barcode from test Barcode input text in html
+        if(testbarcode5 != null){
+            count++;
+        }
+        console.log(count) //count for how many are not null
 
         poolBarcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
         testBarcodeSelectQuery = `SELECT testBarcode FROM Employeetest;`;
@@ -901,7 +932,7 @@ app.get("/addPoolMapping", function (req, res) {
                     poolBarcodeDoesNotExist = false
             }
             console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-
+            if(count==1){
             connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
                 if (err) throw err;
 
@@ -933,8 +964,10 @@ app.get("/addPoolMapping", function (req, res) {
                     // implement extra code
                 }
             });
-        });
-
+        }
+    
+    
+    }); 
     }catch(e){
             console.log("did not add pool mapping");
         }
