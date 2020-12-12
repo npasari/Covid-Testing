@@ -737,6 +737,7 @@ app.get("/wellTesting", function(req, res){
                 </div>
             </form>
         
+            <form id="editWT" action='/editWellTesting' method="get">
             <div id="tab">
                 <table id="list" border="1">
                         <tr>
@@ -750,7 +751,6 @@ app.get("/wellTesting", function(req, res){
             </div>
             <br>
         
-            <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
             </form>
             <form id="return" action='/labHome' method="get">
@@ -773,9 +773,6 @@ app.get("/wellTesting", function(req, res){
 
 app.get("/addWellTesting", function (req, res) {
     try {
-        // res.writeHead(200, {
-        //     "Content-Type": "text/html"
-        // });
 
         let html = `<html>
         <head>
@@ -895,8 +892,8 @@ app.get("/addWellTesting", function (req, res) {
                     <button type="submit" id="add" class="add">Add</button><br><br>
                 </div>
             </form>
-        
-            <div id="tab">
+            <form id="editWT" action='/editWellTesting' method="get">
+                <div id="tab">
                 <table id="list" border="1">
                         <tr>
                             <th class="abc dist">Select</th>
@@ -908,7 +905,6 @@ app.get("/addWellTesting", function (req, res) {
             </div>
             <br>
         
-            <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
             </form>
             <form id="return" action='/labHome' method="get">
@@ -992,9 +988,7 @@ app.get("/addWellTesting", function (req, res) {
         connection.query(constructSQLWellCommand(), function(err, results){
             if(err) throw err;
             let arr = writeWellTable(results);
-            //html = html.replace("</table>", writeWellTable(results));
             console.log(arr);
-            //res.write(html + "</table>\n\n</body>\n</html>");
             res.redirect('/wellTesting')
             res.end();
         });
@@ -1026,13 +1020,6 @@ function constructSQLWellCommand(){
 function writeWellTable(SQLResult){
     console.log(SQLResult);
     let tableStr = "";
-    // `<table id="list" border="1">
-    // <tr>
-    //     <th class="abc dist">Select</th>
-    //     <th class="abc dist">Well Barcode</th>
-    //     <th class="abc dist">Pool Barcode</th>
-    //     <th class="abc dist">Results</th>
-    // </tr>`;
     for(let item of SQLResult){
         tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK +"\"></td>" +
         "<td> " + item.wellBarcodeFK + " </td>" +
@@ -1040,7 +1027,6 @@ function writeWellTable(SQLResult){
         "<td> " + item.result + " </td>" +
         "</tr>";
     }
-    //tableStr += "</table>"
     console.log(tableStr);
     return tableStr;
 
