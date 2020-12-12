@@ -152,8 +152,6 @@ app.get("/testCollection", function (req, res) {
         <input type="submit" id = "addButton" value="Add"  />
         </form>
         <br>
-        <button id = "deleteButton" > Delete  </button>
-        <br>
         <form id="return" action='/labHome' method="get">
             <input type="submit" id="return" value="Return" />
         </form>
@@ -475,8 +473,6 @@ app.get("/addTestCollection", function(req, res) {
                 <input type="submit" id = "addButton" value="Add"  />
                 </form>
 
-                <button id = "deleteButton" > Delete  </button>
-
                 <form id="return" action='/labHome' method="get">
                 <input type="submit" id="return" value="Return" />
                 </form>
@@ -569,21 +565,21 @@ app.get("/addTestCollection", function(req, res) {
 // end of get request for the "add" button
 
 // switch to post request
-app.post("/deleteTestCollection", function(req, res) {
-        res.writeHead(200, { "Content-Type": "text/html" });
+// app.post("/deleteTestCollection", function(req, res) {
+//         res.writeHead(200, { "Content-Type": "text/html" });
         
-        // req.body contains whatever was in the "data" part of the Ajax post request
-        var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
-        var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
-        testbarcode = testbarcode.join("");
+//         // req.body contains whatever was in the "data" part of the Ajax post request
+//         var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
+//         var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
+//         testbarcode = testbarcode.join("");
 
-        deleteQuery = `DELETE from EmployeeTest where testBarcode = ` + testbarcode + `;`;
+//         deleteQuery = `DELETE from EmployeeTest where testBarcode = ` + testbarcode + `;`;
 
-        connection.query(deleteQuery, function(err, result) {
-            if (err) throw err;
-            console.log("deleted successfully")
-        })
-});
+//         connection.query(deleteQuery, function(err, result) {
+//             if (err) throw err;
+//             console.log("deleted successfully")
+//         })
+// });
 
 
 
@@ -757,9 +753,6 @@ app.get("/wellTesting", function(req, res){
             <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
             </form>
-            <form id="deleteWT" action='/deleteWellTesting' method="get">
-                <input type="submit" id="delete" value="Delete" />
-            </form>
             <form id="return" action='/labHome' method="get">
                 <input type="submit" id="return" value="Return" />
             </form>`;
@@ -917,9 +910,6 @@ app.get("/addWellTesting", function (req, res) {
         
             <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
-            </form>
-            <form id="deleteWT" action='/deleteWellTesting' method="get">
-                <input type="submit" id="delete" value="Delete" />
             </form>
             <form id="return" action='/labHome' method="get">
                     <input type="submit" id="return" value="Return" />
