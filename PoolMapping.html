@@ -82,6 +82,20 @@
     span {
         font-size: 17px;
     }
+
+    table { 
+            margin: 25px 0; 
+            width: 200px; 
+        } 
+  
+    table th, table td { 
+        padding: 10px; 
+        text-align: center; 
+    } 
+  
+    table, th, td { 
+        border: 1px solid; 
+    } 
 </style>
 
 <script>
@@ -121,18 +135,56 @@
         <!-- <form action="/submitPool" method="get"> -->
         <form id = "poolMapForm">
             <label for="poolBarcode"><b>Pool Barcode</b></label><br>
-            <input type="text" name="poolBarcode" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
+            <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
             
             
             <label for="testBarcodes"><b>Test Barcodes</b></label><br>
             <div id="test">
                 <div class="input_field">
-                    <input type="text" name="testBarcode" id="testBarcode" placeholder="Test Barcode" required>
+                    <input type="text" name="testB" id="testBarcode" placeholder="Test Barcode" required>
                     <button id= "deleteTest" onclick="deleteTestBarcode1(this);">delete</button><br><br>    
                 </div>
             </div><br>
             <button id= "addTest" onclick="addTestBarcode()">Add Barcode</button><br><br>
-            <button type="submit" id="submitPool" onclick="submit()">Submit Pool</button><br><br>
+            <button type="submit" value ="click" id="submitPool" onclick="submit()">Submit Pool</button><br><br>
         </form>
     </div>
+
+    <table class="displaytable" id="tablecodes">
+        <thead>
+            <tr>
+                <th>Pool Barcode</th>
+                <th>Test Barcodes</th>
+            </tr>
+        </thead>
+        <tr></tr>
+    </table>
+    
+</body>
 </html>
+<!-- <script src= 
+"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"> 
+</script> 
+<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js" type="text/javascript"></script>
+
+<script id="poolmaptable" type="text/x-jquery-tmpl">
+    <tr>
+        <th>${PoolBarcode}</th>
+        <th>${TestBarcodes}</th>
+    </tr>
+</script>
+
+
+<script>
+    $(function () {
+        $('#click').click(function (e) {
+            var model = new Object();
+
+            // Here you need to get the values using $('#id').val() and fill the model
+            model.PoolBarcode = $("poolBarcode").val()
+            model.TestBarcodes = $("testBarcode").val()
+
+            $("#poolmaptable").tmpl(model).appendTo("#tablecodes");
+        });
+    });
+</script> -->

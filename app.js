@@ -2,14 +2,14 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "72Buggyrides",
-    database: "final",
+    password: "25XOvyaKRu",
+    database: "finalprojectschema",
     port: "3306"
 });
 
 const express = require('express');
 ////const path = require('path');
-var session = require('express-session');
+// var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 const app = express();
@@ -171,9 +171,9 @@ app.get("/testCollection", function (req, res) {
     })
 })
 
-app.get("/poolMapping", function(req, res){
-    res.sendFile(__dirname + "/PoolMapping.html");
-})
+// app.get("/poolMapping", function(req, res){
+//     res.sendFile(__dirname + "/PoolMapping.html");
+// })
 
 app.get("/labAuth", function(req, res){
     let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
@@ -568,6 +568,377 @@ app.post("/deleteTestCollection", function(req, res) {
         })
 });
 
+app.get("/poolMapping", function(req, res){
+    try {
+        res.writeHead(200, {"Content-Type": "text/html"});
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+        let html = `<!DOCTYPE html>
+        <html>
+        
+        <head>
+            <title>Pool Mapping</title>
+        </head>
+        
+        <style type="text/css">
+            h1 {
+                text-align: center;
+                padding: 20px;
+                background: #007991;
+                background: #D31027;
+                background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+                background: linear-gradient(to right, #EA384D, #D31027);
+                color: black;
+                letter-spacing: 0.2rem;
+                margin-bottom: 90px;
+            }
+        
+            .poolMapping {
+                width: 412px;
+                overflow: hidden;
+                margin: auto;
+                margin: 20 0 0 450px;
+                padding: 80px;
+                background: #9fa2f5;
+                border-radius: 15px;
+            }
+        
+            #poolBarcode {
+                width: 400px;
+                height: 50px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #test {
+                border-style: solid;
+                border-radius: 3px;
+                padding-left: 25px;
+                padding-top: 10px;
+                padding-right: 25px;
+                padding-bottom: 10px;
+            }
+        
+            #testBarcode {
+                float: left;
+                width: 250px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+                margin-right: 25px;
+            }
+        
+            #deleteTest {
+                float: left;
+                color: darkred;
+                width: 70px;
+                height: 30px;
+                border-radius: 3px;
+            }
+        
+            #addTest {
+                width: 100px;
+                height: 30px;
+                color: blue;
+                border-radius: 3px;
+            }
+        
+            #submitPool {
+                width: 400px;
+                height: 50px;
+                border: none;
+                border-radius: 17px;
+                padding-left: 7px;
+                color: blue;
+            }
+        
+            span {
+                font-size: 17px;
+            }
+        
+            table { 
+                    margin: 25px 0; 
+                    width: 200px; 
+                } 
+          
+            table th, table td { 
+                padding: 10px; 
+                text-align: center; 
+            } 
+          
+            table, th, td { 
+                border: 1px solid; 
+            } 
+        </style>
+        
+        <body>
+            <h1>Pool Mapping</h1>
+            <div class="poolMapping">
+                <!-- <form action="/submitPool" method="get"> -->
+                <form id = "poolMapForm" action="/addPoolMapping" method = "get">
+                    <label for="poolBarcode"><b>Pool Barcode</b></label><br>
+                    <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
+                    
+                    
+                    <label for="testBarcodes"><b>Test Barcodes</b></label><br>
+                    <div id="test">
+                        <div class="input_field">
+                            <input type="text" name="testB" id="testBarcode" placeholder="Test Barcode" required>
+                            <button id= "deleteTest">delete</button><br><br>    
+                        </div>
+                    </div><br>
+                    <button id= "addTest">Add Barcode</button><br><br>
+                    <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
+                </form>
+            </div>
+        
+            <table class="displaytable" id="tablecodes">
+                <thead>
+                    <tr>
+                        <th>Pool Barcode</th>
+                        <th>Test Barcodes</th>
+                    </tr>
+                </thead>
+                <tr></tr>
+            </table>`;
+        connection.query(constructSQLPoolCommand(), function(err, results){
+            if(err) throw err;
+            let arr = writePoolTable(results);
+            //console.log(arr);
+            html = html.replace("<tr></tr>", arr)
+            res.write(html + "\n\n</body>\n</html>");
+            res.end();
+        });
+    } // end of try block
+    catch (e) {
+        console.log("could not add");
+    }
+
+});
+
+function constructSQLPoolCommand(){
+    var sql = `SELECT * FROM PoolMap P1, Pool P
+                WHERE P.poolBarcode = P1.poolBarcode;`;
+    return sql;
+};
+
+// Updates the Pool Testing HTML table dependent on the queries made to the database
+function writePoolTable(SQLResult){
+    console.log(SQLResult);
+    let tableStr = "";
+    for(let item of SQLResult){
+        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.poolBarcode + "\" value=\"" + item.poolBarcode +"\"></td>" +
+        "<td> " + item.poolBarcode + " </td>" +
+        "<td> " + item.testBarcode + " </td>" +
+        "</tr>";
+    }
+    //tableStr += "</table>"
+    console.log(tableStr);
+    return tableStr;
+}
+
+
+app.get("/addPoolMapping", function (req, res) {
+    try {
+        // res.writeHead(200, {
+        //     "Content-Type": "text/html"
+        // });
+
+        let html = `<!DOCTYPE html>
+        <html>
+        
+        <head>
+            <title>Pool Mapping</title>
+        </head>
+        
+        <style type="text/css">
+            h1 {
+                text-align: center;
+                padding: 20px;
+                background: #007991;
+                background: #D31027;
+                background: -webkit-linear-gradient(to right, #EA384D, #D31027);
+                background: linear-gradient(to right, #EA384D, #D31027);
+                color: black;
+                letter-spacing: 0.2rem;
+                margin-bottom: 90px;
+            }
+        
+            .poolMapping {
+                width: 412px;
+                overflow: hidden;
+                margin: auto;
+                margin: 20 0 0 450px;
+                padding: 80px;
+                background: #9fa2f5;
+                border-radius: 15px;
+            }
+        
+            #poolBarcode {
+                width: 400px;
+                height: 50px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
+        
+            #test {
+                border-style: solid;
+                border-radius: 3px;
+                padding-left: 25px;
+                padding-top: 10px;
+                padding-right: 25px;
+                padding-bottom: 10px;
+            }
+        
+            #testBarcode {
+                float: left;
+                width: 250px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+                margin-right: 25px;
+            }
+        
+            #deleteTest {
+                float: left;
+                color: darkred;
+                width: 70px;
+                height: 30px;
+                border-radius: 3px;
+            }
+        
+            #addTest {
+                width: 100px;
+                height: 30px;
+                color: blue;
+                border-radius: 3px;
+            }
+        
+            #submitPool {
+                width: 400px;
+                height: 50px;
+                border: none;
+                border-radius: 17px;
+                padding-left: 7px;
+                color: blue;
+            }
+        
+            span {
+                font-size: 17px;
+            }
+        
+            table { 
+                    margin: 25px 0; 
+                    width: 200px; 
+                } 
+          
+            table th, table td { 
+                padding: 10px; 
+                text-align: center; 
+            } 
+          
+            table, th, td { 
+                border: 1px solid; 
+            } 
+        </style>
+        
+        <body>
+            <h1>Pool Mapping</h1>
+            <div class="poolMapping">
+                <!-- <form action="/submitPool" method="get"> -->
+                <form id = "poolMapForm" action="/addPoolMapping" method = "get">
+                    <label for="poolBarcode"><b>Pool Barcode</b></label><br>
+                    <input type="text" name="poolB" id="poolBarcode" placeholder="Pool Barcode" required><br><br>
+                    
+                    
+                    <label for="testBarcodes"><b>Test Barcodes</b></label><br>
+                    <div id="test">
+                        <div class="input_field">
+                            <input type="text" name="testB" id="testBarcode" placeholder="Test Barcode" required>
+                            <button id= "deleteTest">delete</button><br><br>    
+                        </div>
+                    </div><br>
+                    <button id= "addTest">Add Barcode</button><br><br>
+                    <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
+                </form>
+            </div>
+        
+            <table class="displaytable" id="tablecodes">
+                <thead>
+                    <tr>
+                        <th>Pool Barcode</th>
+                        <th>Test Barcodes</th>
+                    </tr>
+                </thead>
+                <tr></tr>
+            </table>
+            
+        </body>
+        </html>`;
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+
+        var poolbarcode = query.poolB // get PoolBarcode from poolBarcode input text in html
+        console.log("Pool Barcode is " + poolbarcode)
+        var testbarcode = query.testB
+        console.log("Test Barcode is " + testbarcode) // get test Barcode from test Barcode input text in html
+        
+
+        poolBarcodeSelectQuery = `SELECT poolBarcode FROM pool;`;
+        testBarcodeSelectQuery = `SELECT testBarcode FROM Employeetest;`;
+
+        let poolBarcodeDoesNotExist = true // poolBarcode does not exist in table
+        let testbarcodeExists = false // testBarcode exists in table
+
+        connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+            if (err) throw err;
+
+            for (i = 0; i < result.length; i++) {
+                console.log("pool barcode vals: " + result[i].poolBarcode)
+                if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                    poolBarcodeDoesNotExist = false
+            }
+            console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+
+            connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("test barcode vals: " + result[i].testBarcode)
+                    if (testbarcode == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                        testbarcodeExists = true
+                }
+                console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                    //inserts into the pool table first
+                    let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                    console.log(sqlQuery);
+                    connection.query(sqlQuery, function(err, results){
+                        if(err) throw err;
+                    });
+                    
+                    //inserts into the poolMapping table
+                    sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                    VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode + `'), 
+                    (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                    connection.query(sqlQuery, function(err, results){
+                        if(err) throw err;
+                    });
+                } else {
+                    console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                    // DO NOT ADD extra row to the html
+                    // implement extra code
+                }
+            });
+        });
+
+    }catch(e){
+            console.log("did not add pool mapping");
+        }
+});
 
 
 // app.get("/wellTesting", function (req, res) {
