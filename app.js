@@ -2,8 +2,8 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "25XOvyaKRu",
-    database: "finalprojectschema",
+    password: "72Buggyrides",
+    database: "final",
     port: "3306"
 });
 
@@ -339,6 +339,9 @@ app.get("/EmployeeResults", function(req, res){
                 <th>Collection Date</th>
                 <th>Result</th>
             </tr>
+            <tr>
+                <td>No Test</td>
+            </tr>
             </table>`;
         var employeeID = req.cookies['employeeID'];
         console.log(employeeID);
@@ -349,6 +352,7 @@ app.get("/EmployeeResults", function(req, res){
         P.poolBarcode = P1.poolBarcode AND P1.poolBarcode = W.poolBarcodeFK;`
         console.log(employeeID);
         let html1 = '';
+        //console.log(sql)
         connection.query(sql, function(err, result){
             if(err) throw err;
             for(let item of result){
@@ -358,7 +362,7 @@ app.get("/EmployeeResults", function(req, res){
                     <td> ` + item.collectionTime + ` </td>
                     <td> ` + item.result + ` </td></pre>`;
             }
-            html.replace("<td>No Test</td>", html1);
+            html = html.replace("<td>No Test</td>", html1);
             res.write(html + "\n\n</body>\n</html>");
         });
 
