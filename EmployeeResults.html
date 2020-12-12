@@ -3,6 +3,13 @@
     <head>
     <title>Employee Results</title>
     <style type="text/css">
+
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
     h1{  
         text-align: center;  
         padding: 20px;  
@@ -53,6 +60,16 @@
     span{   
         font-size: 17px;  
     }  
+    .abc{
+        border-left: 7px solid #9bdfe8 ;
+        padding-left: 6px;
+        background-color: #9fa2f5;
+    }
+
+    .dist{
+        width: 120px;
+        transition: background, 2.0s;
+    }
 
     </style>
     </head>
@@ -60,8 +77,8 @@
         <h1>Employee Testing Results</h1>
         <table>
         <tr>
-            <th>Collection Date</th>
-            <th>Result</th>
+            <th class = "abc dist">Collection Date</th>
+            <th class = "abc dist">Result</th>
         </tr>
         </table>
     </body>
