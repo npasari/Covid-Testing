@@ -106,6 +106,14 @@ app.get("/testCollection", function (req, res) {
           padding-left: 8px;
         }
 
+        #return {
+            width: 150px;
+            height: 35px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+        }
+
         #addButton {
           width: 150px;
           height: 35px;
@@ -140,16 +148,14 @@ app.get("/testCollection", function (req, res) {
               <input type="text" name = "testB" id = "testbarcode"/>
           </div>
         </div>
-
+        <br>
         <input type="submit" id = "addButton" value="Add"  />
         </form>
-
+        <br>
         <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
+            <input type="submit" id="return" value="Return" />
         </form>
-
-        <button id = "deleteButton" > Delete  </button>
-
+        <br>
           <table id="dataTable" name = "dataTable" width="350px" border="1">
             <tr>
               <th> Select </th>
@@ -436,6 +442,14 @@ app.get("/addTestCollection", function(req, res) {
                   border-radius: 3px;
                   padding-left: 8px;
                 }
+
+                #return {
+                    width: 150px;
+                    height: 35px;
+                    border: none;
+                    border-radius: 3px;
+                    padding-left: 8px;
+                }
               </style>
             </head>
 
@@ -458,11 +472,10 @@ app.get("/addTestCollection", function(req, res) {
 
                 <input type="submit" id = "addButton" value="Add"  />
                 </form>
-                <form id="return" action='/labHome' method="get">
-                    <input type="submit" id="return" value="Return" />
-                </form>
 
-                <button id = "deleteButton" > Delete  </button>
+                <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+                </form>
 
                   <table id="dataTable" name = "dataTable" width="350px" border="1">
                     <tr>
@@ -552,21 +565,21 @@ app.get("/addTestCollection", function(req, res) {
 // end of get request for the "add" button
 
 // switch to post request
-app.post("/deleteTestCollection", function(req, res) {
-        res.writeHead(200, { "Content-Type": "text/html" });
+// app.post("/deleteTestCollection", function(req, res) {
+//         res.writeHead(200, { "Content-Type": "text/html" });
         
-        // req.body contains whatever was in the "data" part of the Ajax post request
-        var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
-        var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
-        testbarcode = testbarcode.join("");
+//         // req.body contains whatever was in the "data" part of the Ajax post request
+//         var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
+//         var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
+//         testbarcode = testbarcode.join("");
 
-        deleteQuery = `DELETE from EmployeeTest where testBarcode = ` + testbarcode + `;`;
+//         deleteQuery = `DELETE from EmployeeTest where testBarcode = ` + testbarcode + `;`;
 
-        connection.query(deleteQuery, function(err, result) {
-            if (err) throw err;
-            console.log("deleted successfully")
-        })
-});
+//         connection.query(deleteQuery, function(err, result) {
+//             if (err) throw err;
+//             console.log("deleted successfully")
+//         })
+// });
 
 app.get("/poolMapping", function(req, res){
     try {
@@ -1352,6 +1365,14 @@ app.get("/wellTesting", function(req, res){
                 border-radius: 3px;
                 padding-left: 8px;
             }
+
+            #return {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             .abc{
                     border-left: 7px solid #9bdfe8 ;
@@ -1387,6 +1408,7 @@ app.get("/wellTesting", function(req, res){
                 </div>
             </form>
         
+            <form id="editWT" action='/editWellTesting' method="get">
             <div id="tab">
                 <table id="list" border="1">
                         <tr>
@@ -1400,11 +1422,7 @@ app.get("/wellTesting", function(req, res){
             </div>
             <br>
         
-            <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
-            </form>
-            <form id="deleteWT" action='/deleteWellTesting' method="get">
-                <input type="submit" id="delete" value="Delete" />
             </form>
             <form id="return" action='/labHome' method="get">
                 <input type="submit" id="return" value="Return" />
@@ -1426,9 +1444,6 @@ app.get("/wellTesting", function(req, res){
 
 app.get("/addWellTesting", function (req, res) {
     try {
-        // res.writeHead(200, {
-        //     "Content-Type": "text/html"
-        // });
 
         let html = `<html>
         <head>
@@ -1506,6 +1521,14 @@ app.get("/addWellTesting", function (req, res) {
                 border-radius: 3px;
                 padding-left: 8px;
             }
+
+            #return {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             .abc{
                     border-left: 7px solid #9bdfe8 ;
@@ -1540,8 +1563,8 @@ app.get("/addWellTesting", function (req, res) {
                     <button type="submit" id="add" class="add">Add</button><br><br>
                 </div>
             </form>
-        
-            <div id="tab">
+            <form id="editWT" action='/editWellTesting' method="get">
+                <div id="tab">
                 <table id="list" border="1">
                         <tr>
                             <th class="abc dist">Select</th>
@@ -1553,11 +1576,10 @@ app.get("/addWellTesting", function (req, res) {
             </div>
             <br>
         
-            <form id="editWT" action='/editWellTesting' method="get">
                 <input type="submit" id="edit" value="Edit" />
             </form>
-            <form id="deleteWT" action='/deleteWellTesting' method="get">
-                <input type="submit" id="delete" value="Delete" />
+            <form id="return" action='/labHome' method="get">
+                    <input type="submit" id="return" value="Return" />
             </form>`;
 
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
@@ -1637,9 +1659,7 @@ app.get("/addWellTesting", function (req, res) {
         connection.query(constructSQLWellCommand(), function(err, results){
             if(err) throw err;
             let arr = writeWellTable(results);
-            //html = html.replace("</table>", writeWellTable(results));
             console.log(arr);
-            //res.write(html + "</table>\n\n</body>\n</html>");
             res.redirect('/wellTesting')
             res.end();
         });
@@ -1671,13 +1691,6 @@ function constructSQLWellCommand(){
 function writeWellTable(SQLResult){
     console.log(SQLResult);
     let tableStr = "";
-    // `<table id="list" border="1">
-    // <tr>
-    //     <th class="abc dist">Select</th>
-    //     <th class="abc dist">Well Barcode</th>
-    //     <th class="abc dist">Pool Barcode</th>
-    //     <th class="abc dist">Results</th>
-    // </tr>`;
     for(let item of SQLResult){
         tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK +"\"></td>" +
         "<td> " + item.wellBarcodeFK + " </td>" +
@@ -1685,7 +1698,6 @@ function writeWellTable(SQLResult){
         "<td> " + item.result + " </td>" +
         "</tr>";
     }
-    //tableStr += "</table>"
     console.log(tableStr);
     return tableStr;
 
