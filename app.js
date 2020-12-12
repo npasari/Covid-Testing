@@ -347,7 +347,7 @@ app.get("/EmployeeResults", function(req, res){
         console.log(employeeID);
         let sql = `SELECT E1.collectionTime, W.result FROM 
         Employee E, EmployeeTest E1, WellTesting W, PoolMap P, Pool P1 WHERE 
-        E.employeeID = E1.employeeID AND E.employeeID = '%${employeeID}%' 
+        E.employeeID = E1.employeeID AND E.employeeID = '` + employeeID +`' 
         AND E1.testBarcode = P.testBarcode AND
         P.poolBarcode = P1.poolBarcode AND P1.poolBarcode = W.poolBarcodeFK;`
         console.log(employeeID);
@@ -669,6 +669,14 @@ app.get("/poolMapping", function(req, res){
                 padding-left: 7px;
                 color: blue;
             }
+
+            #return {
+                width: 150px;
+                height: 35px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             span {
                 font-size: 17px;
@@ -710,6 +718,10 @@ app.get("/poolMapping", function(req, res){
                     <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
                 </form>
             </div>
+
+            <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+            </form>
         
             <table class="displaytable" id="tablecodes">
                 <thead>
@@ -844,6 +856,14 @@ app.get("/addPoolMapping", function (req, res) {
                 padding-left: 7px;
                 color: blue;
             }
+
+            #return {
+                width: 150px;
+                height: 35px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             span {
                 font-size: 17px;
@@ -885,6 +905,10 @@ app.get("/addPoolMapping", function (req, res) {
                     <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
                 </form>
             </div>
+
+            <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+            </form>
         
             <table class="displaytable" id="tablecodes">
                 <thead>
