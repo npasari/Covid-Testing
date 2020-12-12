@@ -2,8 +2,8 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "C00ki3M0nst3r",
-    database: "finalprojectschema",
+    password: "72Buggyrides",
+    database: "final",
     port: "3306"
 });
 
@@ -965,6 +965,18 @@ app.get("/addWellTesting", function (req, res) {
     } // end of try block
     catch (e) {
         console.log("Error could not add")
+    }
+});
+
+app.get("/editWellTesting", function (req, res) {
+    try {
+        let query = url.parse(req.url, true).query;
+        console.log(query.edit);
+        
+
+    } // end of try block
+    catch (e) {
+        console.log("Error could not edit")
     }
 });
 
