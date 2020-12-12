@@ -106,6 +106,14 @@ app.get("/testCollection", function (req, res) {
           padding-left: 8px;
         }
 
+        #return {
+            width: 150px;
+            height: 35px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+        }
+
         #addButton {
           width: 150px;
           height: 35px;
@@ -140,16 +148,16 @@ app.get("/testCollection", function (req, res) {
               <input type="text" name = "testB" id = "testbarcode"/>
           </div>
         </div>
-
+        <br>
         <input type="submit" id = "addButton" value="Add"  />
         </form>
-
-        <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
-        </form>
-
+        <br>
         <button id = "deleteButton" > Delete  </button>
-
+        <br>
+        <form id="return" action='/labHome' method="get">
+            <input type="submit" id="return" value="Return" />
+        </form>
+        <br>
           <table id="dataTable" name = "dataTable" width="350px" border="1">
             <tr>
               <th> Select </th>
@@ -436,6 +444,14 @@ app.get("/addTestCollection", function(req, res) {
                   border-radius: 3px;
                   padding-left: 8px;
                 }
+
+                #return {
+                    width: 150px;
+                    height: 35px;
+                    border: none;
+                    border-radius: 3px;
+                    padding-left: 8px;
+                }
               </style>
             </head>
 
@@ -458,11 +474,12 @@ app.get("/addTestCollection", function(req, res) {
 
                 <input type="submit" id = "addButton" value="Add"  />
                 </form>
-                <form id="return" action='/labHome' method="get">
-                    <input type="submit" id="return" value="Return" />
-                </form>
 
                 <button id = "deleteButton" > Delete  </button>
+
+                <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+                </form>
 
                   <table id="dataTable" name = "dataTable" width="350px" border="1">
                     <tr>
@@ -681,6 +698,14 @@ app.get("/wellTesting", function(req, res){
                 border-radius: 3px;
                 padding-left: 8px;
             }
+
+            #return {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             .abc{
                     border-left: 7px solid #9bdfe8 ;
@@ -835,6 +860,14 @@ app.get("/addWellTesting", function (req, res) {
                 border-radius: 3px;
                 padding-left: 8px;
             }
+
+            #return {
+                width: 80px;
+                height: 30px;
+                border: none;
+                border-radius: 3px;
+                padding-left: 8px;
+            }
         
             .abc{
                     border-left: 7px solid #9bdfe8 ;
@@ -887,6 +920,9 @@ app.get("/addWellTesting", function (req, res) {
             </form>
             <form id="deleteWT" action='/deleteWellTesting' method="get">
                 <input type="submit" id="delete" value="Delete" />
+            </form>
+            <form id="return" action='/labHome' method="get">
+                    <input type="submit" id="return" value="Return" />
             </form>`;
 
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
