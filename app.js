@@ -144,6 +144,10 @@ app.get("/testCollection", function (req, res) {
         <input type="submit" id = "addButton" value="Add"  />
         </form>
 
+        <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+        </form>
+
         <button id = "deleteButton" > Delete  </button>
 
           <table id="dataTable" name = "dataTable" width="350px" border="1">
@@ -454,6 +458,9 @@ app.get("/addTestCollection", function(req, res) {
 
                 <input type="submit" id = "addButton" value="Add"  />
                 </form>
+                <form id="return" action='/labHome' method="get">
+                    <input type="submit" id="return" value="Return" />
+                </form>
 
                 <button id = "deleteButton" > Delete  </button>
 
@@ -727,6 +734,9 @@ app.get("/wellTesting", function(req, res){
             </form>
             <form id="deleteWT" action='/deleteWellTesting' method="get">
                 <input type="submit" id="delete" value="Delete" />
+            </form>
+            <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
             </form>`;
             connection.query(constructSQLWellCommand(), function(err, results){
                 if(err) throw err;
