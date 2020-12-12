@@ -707,10 +707,10 @@ app.get("/poolMapping", function(req, res){
                     <div id="test">
                         <div class="input_field">
                             <input type="text" name="testB1" class="testBarcode" placeholder="Test Barcode" required>
-                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional2" >
+                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional3" >
+                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional4" >
+                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional5" >
                             <br><br>    
                         </div>
                     </div><br>
@@ -894,10 +894,10 @@ app.get("/addPoolMapping", function (req, res) {
                     <div id="test">
                         <div class="input_field">
                             <input type="text" name="testB1" class="testBarcode" placeholder="Test Barcode" required>
-                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional" >
-                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional" >
+                            <input type="text" name="testB2" class="testBarcode" placeholder="Test Barcode optional2" >
+                            <input type="text" name="testB3" class="testBarcode" placeholder="Test Barcode optional3" >
+                            <input type="text" name="testB4" class="testBarcode" placeholder="Test Barcode optional4" >
+                            <input type="text" name="testB5" class="testBarcode" placeholder="Test Barcode optional5" >
                             <br><br>    
                         </div>
                     </div><br>
