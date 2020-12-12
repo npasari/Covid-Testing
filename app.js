@@ -2,8 +2,8 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "72Buggyrides",
-    database: "final",
+    password: "root",
+    database: "finalprojectschema",
     port: "3306"
 });
 
@@ -14,28 +14,38 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 const app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(cookieParser());
 const url = require('url');
 const {
     strict
 } = require('assert');
-const { request } = require('http');
-const { response } = require('express');
-const { table } = require('console');
-const { write } = require('fs');
+const {
+    request
+} = require('http');
+const {
+    response
+} = require('express');
+const {
+    table
+} = require('console');
+const {
+    write
+} = require('fs');
 
 app.get("/", function (req, res) {
     writeHomePage(req, res);
 });
 
-app.get("/labtechLogin", function(req, res){
+app.get("/labtechLogin", function (req, res) {
     //technicianLogin(req, res);
     res.sendFile(__dirname + '/TechnicianLogin.html')
 
 });
 
-app.get("/labHome", function(req, res){
+app.get("/labHome", function (req, res) {
     //labHome(req, res);
     res.sendFile(__dirname + '/LabHome.html')
 });
@@ -47,7 +57,7 @@ app.get("/employeeLogin", function (req, res) {
 
 app.get("/testCollection", function (req, res) {
     //res.sendFile(__dirname + '/testcollection.html')
-    
+
     let html = `
         <!DOCTYPE html>
     <html>
@@ -112,6 +122,7 @@ app.get("/testCollection", function (req, res) {
             border: none;
             border-radius: 3px;
             padding-left: 8px;
+            margin-top: 5px;
         }
 
         #addButton {
@@ -129,12 +140,26 @@ app.get("/testCollection", function (req, res) {
           border-radius: 3px;
           padding-left: 8px;
         }
+
+        .abc{
+            border-left: 7px solid #9bdfe8 ;
+            padding-left: 6px;
+            background-color: #9fa2f5;
+        }
+
+        .dist{
+            width: 120px;
+            transition: background, 2.0s;
+        }
       </style>
     </head>
 
       <body>
 
         <h1> Test Collection </h1>
+        <form id="return" action='/labHome' method="get">
+            <input type="submit" id="return" value="Return" />
+        </form>
         <div class = "testCollect">
 
           <form id = "addForm" action = '/addTestCollection' method = "get">
@@ -152,20 +177,18 @@ app.get("/testCollection", function (req, res) {
         <input type="submit" id = "addButton" value="Add"  />
         </form>
         <br>
-        <form id="return" action='/labHome' method="get">
-            <input type="submit" id="return" value="Return" />
-        </form>
+        
         <br>
           <table id="dataTable" name = "dataTable" width="350px" border="1">
             <tr>
-              <th> Select </th>
-              <th> Employee ID </th>
-              <th> Test Barcode </th>
+              <th class="abc dist"> Select </th>
+              <th class ="abc dist"> Employee ID </th>
+              <th class ="abc dist"> Test Barcode </th>
             </tr>`;
 
     sqlquery = "SELECT employeeID, testBarcode FROM EmployeeTest"
 
-    connection.query(sqlquery, function(err, result) {
+    connection.query(sqlquery, function (err, result) {
         if (err) throw err
         // creating the table with the data from result
         for (var i = 0; i < result.length; i++) {
@@ -181,104 +204,112 @@ app.get("/testCollection", function (req, res) {
 //     res.sendFile(__dirname + "/PoolMapping.html");
 // })
 
-app.get("/labAuth", function(req, res){
+app.get("/labAuth", function (req, res) {
     let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-         var labID = query.labId;
-         console.log("email is " + labID);
- 
-         var password = query.password;
-         console.log("password is " + password);
- 
-         var sql = `SELECT * FROM LabEmployee;`;
- 
-         let labIDValid = false // employeeID does not exist in table
- 
-         connection.query(sql, function(err, result){
-             if (err) throw err;
-             var i = 0;
-             while(!labIDValid && i < result.length){
-                 console.log("lab id vals: " + result[i].labID)
-                 console.log(labID);
-                 console.log(result[i].labID);
-                 console.log(password);
-                 console.log(result[i].password);
-                 if (labID == result[i].labID && password == result[i].password){
-                     labIDValid = true
-                 } // if the employeeID exists in the Employee Table
-                 i++;
-             }
-             console.log("is labID in table? " + labIDValid)
-             if(labIDValid){
-                 res.cookie('labID', labID);
-                 res.redirect('/LabHome');
-                 res.end();
-             } else {
-                res.redirect('/LabErrorPage');
-                res.end();
-            }
-         });
+    var labID = query.labId;
+    console.log("email is " + labID);
+
+    var password = query.password;
+    console.log("password is " + password);
+
+    var sql = `SELECT * FROM LabEmployee;`;
+
+    let labIDValid = false // employeeID does not exist in table
+
+    connection.query(sql, function (err, result) {
+        if (err) throw err;
+        var i = 0;
+        while (!labIDValid && i < result.length) {
+            console.log("lab id vals: " + result[i].labID)
+            console.log(labID);
+            console.log(result[i].labID);
+            console.log(password);
+            console.log(result[i].password);
+            if (labID == result[i].labID && password == result[i].password) {
+                labIDValid = true
+            } // if the employeeID exists in the Employee Table
+            i++;
+        }
+        console.log("is labID in table? " + labIDValid)
+        if (labIDValid) {
+            res.cookie('labID', labID);
+            res.redirect('/LabHome');
+            res.end();
+        } else {
+            res.redirect('/LabErrorPage');
+            res.end();
+        }
+    });
 })
 
-app.get("/auth", function (req, res){
-         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+app.get("/auth", function (req, res) {
+    let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-         var employeeEmail = query.email;
-         console.log("email is " + employeeEmail);
- 
-         var password = query.password;
-         console.log("password is " + password);
- 
-         var sql = `SELECT * FROM Employee;`;
+    var employeeEmail = query.email;
+    console.log("email is " + employeeEmail);
 
-         var employeeID = "";
- 
-         let employeeIDValid = false // employeeID does not exist in table
- 
-         connection.query(sql, function(err, result){
-             if (err) throw err;
-             var i = 0;
-             while(!employeeIDValid && i < result.length){
-                 console.log("employee id vals: " + result[i].employeeID)
-                 console.log(employeeEmail);
-                 console.log(result[i].email);
-                 console.log(password);
-                 console.log(result[i].passcode);
-                 if (employeeEmail == result[i].email && password == result[i].passcode){
-                     employeeIDValid = true
-                     employeeID = result[i].employeeID;
-                 } // if the employeeID exists in the Employee Table
-                 i++;
-             }
-             console.log("is employeeID in table? " + employeeIDValid)
-             if(employeeIDValid){
-                 res.cookie('employeeID', employeeID);
-                 res.redirect('/EmployeeResults');
-                 res.end();
-             } else {
-                 res.redirect('/EmployeeErrorPage');
-                 res.end();
-             }
-         });
+    var password = query.password;
+    console.log("password is " + password);
+
+    var sql = `SELECT * FROM Employee;`;
+
+    var employeeID = "";
+
+    let employeeIDValid = false // employeeID does not exist in table
+
+    connection.query(sql, function (err, result) {
+        if (err) throw err;
+        var i = 0;
+        while (!employeeIDValid && i < result.length) {
+            console.log("employee id vals: " + result[i].employeeID)
+            console.log(employeeEmail);
+            console.log(result[i].email);
+            console.log(password);
+            console.log(result[i].passcode);
+            if (employeeEmail == result[i].email && password == result[i].passcode) {
+                employeeIDValid = true
+                employeeID = result[i].employeeID;
+            } // if the employeeID exists in the Employee Table
+            i++;
+        }
+        console.log("is employeeID in table? " + employeeIDValid)
+        if (employeeIDValid) {
+            res.cookie('employeeID', employeeID);
+            res.redirect('/EmployeeResults');
+            res.end();
+        } else {
+            res.redirect('/EmployeeErrorPage');
+            res.end();
+        }
+    });
 })
 
-app.get("/EmployeeErrorPage", function(req, res){
+app.get("/EmployeeErrorPage", function (req, res) {
     res.sendFile(__dirname + '/EmployeeErrorPage.html');
 })
 
-app.get("/LabErrorPage", function(req, res){
+app.get("/LabErrorPage", function (req, res) {
     res.sendFile(__dirname + "/LabErrorPage.html");
 })
 
-app.get("/EmployeeResults", function(req, res){
+app.get("/EmployeeResults", function (req, res) {
     try {
-        res.writeHead(200, {"Content-Type": "text/html"});
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
         let html = `<!DOCTYPE html>
         <html lang = "en">
         <head>
         <title>Employee Results</title>
         <style type="text/css">
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
         h1{  
             text-align: center;  
             padding: 20px;  
@@ -329,6 +360,17 @@ app.get("/EmployeeResults", function(req, res){
         span{   
             font-size: 17px;  
         }  
+
+        .abc{
+            border-left: 7px solid #9bdfe8 ;
+            padding-left: 6px;
+            background-color: #9fa2f5;
+        }
+
+        .dist{
+            width: 120px;
+            transition: background, 2.0s;
+        }
     
         </style>
         </head>
@@ -336,8 +378,8 @@ app.get("/EmployeeResults", function(req, res){
             <h1>Employee Testing Results</h1>
             <table>
             <tr>
-                <th>Collection Date</th>
-                <th>Result</th>
+                <th class = "abc dist">Collection Date</th>
+                <th class = "abc dist">Result</th>
             </tr>
             <tr>
                 <td>No Test</td>
@@ -347,15 +389,15 @@ app.get("/EmployeeResults", function(req, res){
         console.log(employeeID);
         let sql = `SELECT E1.collectionTime, W.result FROM 
         Employee E, EmployeeTest E1, WellTesting W, PoolMap P, Pool P1 WHERE 
-        E.employeeID = E1.employeeID AND E.employeeID = '` + employeeID +`' 
+        E.employeeID = E1.employeeID AND E.employeeID = '` + employeeID + `' 
         AND E1.testBarcode = P.testBarcode AND
         P.poolBarcode = P1.poolBarcode AND P1.poolBarcode = W.poolBarcodeFK;`
         console.log(employeeID);
         let html1 = '';
         //console.log(sql)
-        connection.query(sql, function(err, result){
-            if(err) throw err;
-            for(let item of result){
+        connection.query(sql, function (err, result) {
+            if (err) throw err;
+            for (let item of result) {
                 html1 += `
                 <pre>
                     <tr>
@@ -372,8 +414,8 @@ app.get("/EmployeeResults", function(req, res){
     //res.sendFile(__dirname + '/EmployeeResults.html'); 
 });
 
-app.get("/addTestCollection", function(req, res) {
-        let html = `
+app.get("/addTestCollection", function (req, res) {
+    let html = `
                 <!DOCTYPE html>
             <html>
             <head>
@@ -453,6 +495,18 @@ app.get("/addTestCollection", function(req, res) {
                     border: none;
                     border-radius: 3px;
                     padding-left: 8px;
+                    margin-top: 5px;
+                }
+
+                .abc{
+                    border-left: 7px solid #9bdfe8 ;
+                    padding-left: 6px;
+                    background-color: #9fa2f5;
+                }
+    
+                .dist{
+                    width: 120px;
+                    transition: background, 2.0s;
                 }
               </style>
             </head>
@@ -460,6 +514,10 @@ app.get("/addTestCollection", function(req, res) {
               <body>
 
                 <h1> Test Collection </h1>
+
+                <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+                </form>
                 <div class = "testCollect">
 
                   <form id = "addForm" action = '/addTestCollection' method = "get">
@@ -477,93 +535,86 @@ app.get("/addTestCollection", function(req, res) {
                 <input type="submit" id = "addButton" value="Add"  />
                 </form>
 
-                <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
-                </form>
-
                   <table id="dataTable" name = "dataTable" width="350px" border="1">
                     <tr>
-                      <th> Select </th>
-                      <th> Employee ID </th>
-                      <th> Test Barcode </th>
+                      <th class= "abc dist"> Select </th>
+                      <th class = "abc dist"> Employee ID </th>
+                      <th class = "abc dist"> Test Barcode </th>
                     </tr>`;
 
-        try {
-            res.writeHead(200, { "Content-Type": "text/html" });
-            let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
+    try {
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
+        let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
 
-            var testbarcode = query.testB // get testBarcode from testBarcode input text in html
-            console.log("testb is " + testbarcode)
+        var testbarcode = query.testB // get testBarcode from testBarcode input text in html
+        console.log("testb is " + testbarcode)
 
-            var empID = Number(query.eID)
-            console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
+        var empID = Number(query.eID)
+        console.log("employee ID is " + empID) // get employeeID from employeeID input text in html
 
-            // ATTENCION!!!!!!!!!
-            // GET LAB ID FROM THE HOME PAGE, IMPLEMENT RIGHT HERE
-            // ATTENCION!!!!!!!!!
+        // GET LAB ID FROM THE HOME PAGE, IMPLEMENT RIGHT HERE
 
-            employeeIDSelectQuery = `SELECT employeeID FROM Employee;`;
-            testbarcodeSelectQuery = `SELECT testBarcode FROM EmployeeTest;`;
+        employeeIDSelectQuery = `SELECT employeeID FROM Employee;`;
+        testbarcodeSelectQuery = `SELECT testBarcode FROM EmployeeTest;`;
 
-            let employeeIDValid = false // employeeID does not exist in table
-            let testbarcodeDoesNotExist = true // testBarcode does not exist in table
+        let employeeIDValid = false // employeeID does not exist in table
+        let testbarcodeDoesNotExist = true // testBarcode does not exist in table
 
-            connection.query(employeeIDSelectQuery, function(err, result) { // checking that employeeID is in the table
+        connection.query(employeeIDSelectQuery, function (err, result) { // checking that employeeID is in the table
+            if (err) throw err;
+
+            for (i = 0; i < result.length; i++) {
+                console.log("employee id vals: " + result[i].employeeID)
+                if (empID == result[i].employeeID) // if the employeeID exists in the Employee Table
+                    employeeIDValid = true
+            }
+            console.log("is employeeID in table? " + employeeIDValid)
+
+            connection.query(testbarcodeSelectQuery, function (err, result) { // check that testbarcode is NOT in EmployeeTest
                 if (err) throw err;
-                
+
                 for (i = 0; i < result.length; i++) {
-                    console.log("employee id vals: " + result[i].employeeID)
-                    if (empID == result[i].employeeID) // if the employeeID exists in the Employee Table
-                        employeeIDValid = true
+                    if (testbarcode == result[i].testBarcode) // if the test barcode already exists, set testbarcodeDoesNotExist to false
+                        testbarcodeDoesNotExist = false
                 }
-                console.log("is employeeID in table? " + employeeIDValid)
+                console.log("is testbarcode not in table? " + testbarcodeDoesNotExist)
 
-                connection.query(testbarcodeSelectQuery, function(err, result) { // check that testbarcode is NOT in EmployeeTest
-                    if (err) throw err;
-                    
-                    for (i = 0; i < result.length; i++) {
-                        if (testbarcode == result[i].testBarcode) // if the test barcode already exists, set testbarcodeDoesNotExist to false
-                            testbarcodeDoesNotExist = false
-                    }
-                    console.log("is testbarcode not in table? " + testbarcodeDoesNotExist)
-
-                    if (employeeIDValid && testbarcodeDoesNotExist) { // if EmployeeID exists in table and testbarcode is not in EmployeeTest, inesrt new entry into EmployeeTest
-                        insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
+                if (employeeIDValid && testbarcodeDoesNotExist) { // if EmployeeID exists in table and testbarcode is not in EmployeeTest, inesrt new entry into EmployeeTest
+                    insertQuery = `INSERT into EmployeeTest (testBarcode, employeeID, collectionTime, collectedBy) 
                         VALUES (?, ?, NOW(), ?)`;
 
-                        values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
+                    values = [testbarcode, empID, 'abc'] // 'abc' is dummy labID until I get the actual labID
 
-                        connection.query(insertQuery, values, function (err, result) {
-                            if (err) throw err;
-                            console.log("1 record inserted");
+                    connection.query(insertQuery, values, function (err, result) {
+                        if (err) throw err;
+                        console.log("1 record inserted");
 
-                                sqlquery = "SELECT employeeID, testBarcode FROM EmployeeTest"
+                        sqlquery = "SELECT employeeID, testBarcode FROM EmployeeTest"
 
-                                connection.query(sqlquery, function(err, result) {
-                                    if (err) throw err
-                                    // creating the table with the data from result
-                                    for (var i = 0; i < result.length; i++) {
-                                        newRow = `<tr><td><input type="radio" name = "bill" ></td> <td>` + result[i].employeeID + `</td> <td> ` + result[i].testBarcode + `</td> </tr>`;
-                                        html += newRow
-                                    }
-                                    res.write(html + "</table>\n</body>\n</html>")
-                                    res.end();
-                                })
+                        connection.query(sqlquery, function (err, result) {
+                            if (err) throw err
+                            // creating the table with the data from result
+                            for (var i = 0; i < result.length; i++) {
+                                newRow = `<tr><td><input type="radio" name = "bill" ></td> <td>` + result[i].employeeID + `</td> <td> ` + result[i].testBarcode + `</td> </tr>`;
+                                html += newRow
+                            }
+                            res.write(html + "</table>\n</body>\n</html>")
+                            res.end();
                         })
-                    }
-
-                    else {
-                        console.log("Either EmployeeID is not valid or Testbarcode already exists in the database")
-                        // DO NOT ADD extra row to the html
-                        // implement extra code
-                    }
-                });
+                    })
+                } else {
+                    console.log("Either EmployeeID is not valid or Testbarcode already exists in the database")
+                    // DO NOT ADD extra row to the html
+                    // implement extra code
+                }
             });
-        } // end of try block
-
-        catch (e) {
-            console.log("could not add")
-        }
+        });
+    } // end of try block
+    catch (e) {
+        console.log("could not add")
+    }
 });
 
 // end of get request for the "add" button
@@ -571,7 +622,7 @@ app.get("/addTestCollection", function(req, res) {
 // switch to post request
 // app.post("/deleteTestCollection", function(req, res) {
 //         res.writeHead(200, { "Content-Type": "text/html" });
-        
+
 //         // req.body contains whatever was in the "data" part of the Ajax post request
 //         var testbarcodemessy = Object.keys(req.body)[0]; // getting the first key/value pair
 //         var testbarcode = testbarcodemessy.match(/\d/g); // extracting just the digits, which is testbarcode
@@ -585,9 +636,11 @@ app.get("/addTestCollection", function(req, res) {
 //         })
 // });
 
-app.get("/poolMapping", function(req, res){
+app.get("/poolMapping", function (req, res) {
     try {
-        res.writeHead(200, {"Content-Type": "text/html"});
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
         let html = `<!DOCTYPE html>
         <html>
@@ -597,6 +650,12 @@ app.get("/poolMapping", function(req, res){
         </head>
         
         <style type="text/css">
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
             h1 {
                 text-align: center;
                 padding: 20px;
@@ -606,7 +665,7 @@ app.get("/poolMapping", function(req, res){
                 background: linear-gradient(to right, #EA384D, #D31027);
                 color: black;
                 letter-spacing: 0.2rem;
-                margin-bottom: 90px;
+                margin-bottom: 70px;
             }
         
             .poolMapping {
@@ -696,6 +755,11 @@ app.get("/poolMapping", function(req, res){
         
         <body>
             <h1>Pool Mapping</h1>
+
+            <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+            </form>
+
             <div class="poolMapping">
                 <!-- <form action="/submitPool" method="get"> -->
                 <form id = "poolMapForm" action="/addPoolMapping" method = "get">
@@ -718,10 +782,7 @@ app.get("/poolMapping", function(req, res){
                     <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
                 </form>
             </div>
-
-            <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
-            </form>
+            <br>
         
             <table class="displaytable" id="tablecodes">
                 <thead>
@@ -733,8 +794,8 @@ app.get("/poolMapping", function(req, res){
                 </thead>
                 <tr></tr>
             </table>`;
-        connection.query(constructSQLPoolCommand(), function(err, results){
-            if(err) throw err;
+        connection.query(constructSQLPoolCommand(), function (err, results) {
+            if (err) throw err;
             let arr = writePoolTable(results);
             //console.log(arr);
             html = html.replace("<tr></tr>", arr)
@@ -748,21 +809,21 @@ app.get("/poolMapping", function(req, res){
 
 });
 
-function constructSQLPoolCommand(){
+function constructSQLPoolCommand() {
     var sql = `SELECT * FROM PoolMap P1, Pool P
                 WHERE P.poolBarcode = P1.poolBarcode;`;
     return sql;
 };
 
 // Updates the Pool Testing HTML table dependent on the queries made to the database
-function writePoolTable(SQLResult){
+function writePoolTable(SQLResult) {
     console.log(SQLResult);
     let tableStr = "";
-    for(let item of SQLResult){
-        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.poolBarcode + "\" value=\"" + item.poolBarcode +"\"></td>" +
-        "<td> " + item.poolBarcode + " </td>" +
-        "<td> " + item.testBarcode + " </td>" +
-        "</tr>";
+    for (let item of SQLResult) {
+        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.poolBarcode + "\" value=\"" + item.poolBarcode + "\"></td>" +
+            "<td> " + item.poolBarcode + " </td>" +
+            "<td> " + item.testBarcode + " </td>" +
+            "</tr>";
     }
     //tableStr += "</table>"
     console.log(tableStr);
@@ -784,6 +845,12 @@ app.get("/addPoolMapping", function (req, res) {
         </head>
         
         <style type="text/css">
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
             h1 {
                 text-align: center;
                 padding: 20px;
@@ -793,7 +860,7 @@ app.get("/addPoolMapping", function (req, res) {
                 background: linear-gradient(to right, #EA384D, #D31027);
                 color: black;
                 letter-spacing: 0.2rem;
-                margin-bottom: 90px;
+                margin-bottom: 70px;
             }
         
             .poolMapping {
@@ -883,6 +950,10 @@ app.get("/addPoolMapping", function (req, res) {
         
         <body>
             <h1>Pool Mapping</h1>
+
+            <form id="return" action='/labHome' method="get">
+                <input type="submit" id="return" value="Return" />
+            </form>
             <div class="poolMapping">
                 <!-- <form action="/submitPool" method="get"> -->
                 <form id = "poolMapForm" action="/addPoolMapping" method = "get">
@@ -901,14 +972,11 @@ app.get("/addPoolMapping", function (req, res) {
                             <br><br>    
                         </div>
                     </div><br>
+
                     <button id= "addTest">Add Barcode</button><br><br>
                     <button type="submit" value ="click" id="submitPool">Submit Pool</button><br><br>
                 </form>
             </div>
-
-            <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
-            </form>
         
             <table class="displaytable" id="tablecodes">
                 <thead>
@@ -927,33 +995,33 @@ app.get("/addPoolMapping", function (req, res) {
 
         var poolbarcode = query.poolB // get PoolBarcode from poolBarcode input text in html
         console.log("Pool Barcode is " + poolbarcode)
-        
-        var count=1;
-        
+
+        var count = 1;
+
         var testbarcode1 = query.testB1
         console.log("Test Barcode is " + testbarcode1) // get test Barcode from test Barcode input text in html
-        
+
         var testbarcode2 = query.testB2
         console.log("Test Barcode is " + testbarcode2) // get test Barcode from test Barcode input text in html
-        if(testbarcode2 != ""){
+        if (testbarcode2 != "") {
             count++;
         }
 
         var testbarcode3 = query.testB3
         console.log("Test Barcode is " + testbarcode3) // get test Barcode from test Barcode input text in html
-        if(testbarcode3 != ""){
+        if (testbarcode3 != "") {
             count++;
         }
-        
+
         var testbarcode4 = query.testB4
         console.log("Test Barcode is " + testbarcode4) // get test Barcode from test Barcode input text in html
-        if(testbarcode4 != ""){
+        if (testbarcode4 != "") {
             count++;
         }
-        
+
         var testbarcode5 = query.testB5
         console.log("Test Barcode is " + testbarcode5) // get test Barcode from test Barcode input text in html
-        if(testbarcode5 != ""){
+        if (testbarcode5 != "") {
             count++;
         }
         console.log(count) //count for how many are not null
@@ -963,18 +1031,18 @@ app.get("/addPoolMapping", function (req, res) {
 
         let poolBarcodeDoesNotExist = true // poolBarcode does not exist in table
         let testbarcodeExists = false // testBarcode exists in table
-     
-        if(count==1){
+
+        if (count == 1) {
             connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
                 if (err) throw err;
-    
+
                 for (i = 0; i < result.length; i++) {
                     console.log("pool barcode vals: " + result[i].poolBarcode)
                     if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
                         poolBarcodeDoesNotExist = false
                 }
                 console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-            
+
                 connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
                     if (err) throw err;
 
@@ -989,296 +1057,296 @@ app.get("/addPoolMapping", function (req, res) {
                         //inserts into the pool table first
                         let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
                         console.log(sqlQuery);
-                        connection.query(sqlQuery, function(err, results){
-                            if(err) throw err;
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
                         });
-                        
+
                         //inserts into the poolMapping table
                         sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                         VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
                         (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                        connection.query(sqlQuery, function(err, results){
-                            if(err) throw err;
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
                         });
                     } else {
                         console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
                         // DO NOT ADD extra row to the html
                         // implement extra code
-                        }
-                    });
+                    }
                 });
-            }
-            
-            //count =2
-            if(count==2){
-                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
-                    if (err) throw err;
-        
-                    for (i = 0; i < result.length; i++) {
-                        console.log("pool barcode vals: " + result[i].poolBarcode)
-                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
-                            poolBarcodeDoesNotExist = false
-                    }
-                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-                
-                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
-                        if (err) throw err;
-    
-                        for (i = 0; i < result.length; i++) {
-                            console.log("test barcode vals: " + result[i].testBarcode)
-                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
-                                testbarcodeExists = true
-                        }
-                        console.log("is testbarcode not in table? " + testbarcodeExists)
-    
-                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
-                            //inserts into the pool table first
-                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
-                            console.log(sqlQuery);
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-                            
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
-                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
-                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+            });
+        }
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
-                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
-                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-                        } else {
-                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
-                            // DO NOT ADD extra row to the html
-                            // implement extra code
-                            }
-                        });
-                    });
+        //count =2
+        if (count == 2) {
+            connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                        poolBarcodeDoesNotExist = false
                 }
-        
-            //count =3
-            if(count==3){
-                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+
+                connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
                     if (err) throw err;
-        
+
                     for (i = 0; i < result.length; i++) {
-                        console.log("pool barcode vals: " + result[i].poolBarcode)
-                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
-                            poolBarcodeDoesNotExist = false
+                        console.log("test barcode vals: " + result[i].testBarcode)
+                        if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                            testbarcodeExists = true
                     }
-                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-                
-                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
-                        if (err) throw err;
-    
-                        for (i = 0; i < result.length; i++) {
-                            console.log("test barcode vals: " + result[i].testBarcode)
-                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
-                                testbarcodeExists = true
-                        }
-                        console.log("is testbarcode not in table? " + testbarcodeExists)
-    
-                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
-                            //inserts into the pool table first
-                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
-                            console.log(sqlQuery);
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-                            
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                    console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                    if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                        //inserts into the pool table first
+                        let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                        console.log(sqlQuery);
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+                    } else {
+                        console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
+                    }
+                });
+            });
+        }
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+        //count =3
+        if (count == 3) {
+            connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                        poolBarcodeDoesNotExist = false
+                }
+                console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+
+                connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                    if (err) throw err;
+
+                    for (i = 0; i < result.length; i++) {
+                        console.log("test barcode vals: " + result[i].testBarcode)
+                        if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                            testbarcodeExists = true
+                    }
+                    console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                    if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                        //inserts into the pool table first
+                        let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                        console.log(sqlQuery);
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                            VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
+                            (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-
-                        } else {
-                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
-                            // DO NOT ADD extra row to the html
-                            // implement extra code
-                            }
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
                         });
-                    });
-                }
-            //count =4
-            if(count==4){
-                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
-                    if (err) throw err;
-        
-                    for (i = 0; i < result.length; i++) {
-                        console.log("pool barcode vals: " + result[i].poolBarcode)
-                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
-                            poolBarcodeDoesNotExist = false
+
+                    } else {
+                        console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
                     }
-                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-                
-                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
-                        if (err) throw err;
-    
-                        for (i = 0; i < result.length; i++) {
-                            console.log("test barcode vals: " + result[i].testBarcode)
-                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
-                                testbarcodeExists = true
-                        }
-                        console.log("is testbarcode not in table? " + testbarcodeExists)
-    
-                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
-                            //inserts into the pool table first
-                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
-                            console.log(sqlQuery);
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-                            
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                });
+            });
+        }
+        //count =4
+        if (count == 4) {
+            connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                        poolBarcodeDoesNotExist = false
+                }
+                console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+
+                connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                    if (err) throw err;
+
+                    for (i = 0; i < result.length; i++) {
+                        console.log("test barcode vals: " + result[i].testBarcode)
+                        if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                            testbarcodeExists = true
+                    }
+                    console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                    if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                        //inserts into the pool table first
+                        let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                        console.log(sqlQuery);
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode4 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-
-                        } else {
-                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
-                            // DO NOT ADD extra row to the html
-                            // implement extra code
-                            }
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
                         });
-                    });
-                }
 
-            //count =5
-            if(count==5){
-                connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
-                    if (err) throw err;
-        
-                    for (i = 0; i < result.length; i++) {
-                        console.log("pool barcode vals: " + result[i].poolBarcode)
-                        if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
-                            poolBarcodeDoesNotExist = false
+                    } else {
+                        console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
                     }
-                    console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
-                
-                    connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
-                        if (err) throw err;
-    
-                        for (i = 0; i < result.length; i++) {
-                            console.log("test barcode vals: " + result[i].testBarcode)
-                            if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode || testbarcode5 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
-                                testbarcodeExists = true
-                        }
-                        console.log("is testbarcode not in table? " + testbarcodeExists)
-    
-                        if (poolBarcodeDoesNotExist && testbarcodeExists) {
-                            //inserts into the pool table first
-                            let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
-                            console.log(sqlQuery);
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-                            
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                });
+            });
+        }
+
+        //count =5
+        if (count == 5) {
+            connection.query(poolBarcodeSelectQuery, function (err, result) { // checking that poolbarcode is not in the table
+                if (err) throw err;
+
+                for (i = 0; i < result.length; i++) {
+                    console.log("pool barcode vals: " + result[i].poolBarcode)
+                    if (poolbarcode == result[i].poolBarcode) // if the poolbarcode exists in the pool Table
+                        poolBarcodeDoesNotExist = false
+                }
+                console.log("is poolbarcode in table? " + poolBarcodeDoesNotExist)
+
+                connection.query(testBarcodeSelectQuery, function (err, result) { // check that testbarcode is in the EmployeeTest
+                    if (err) throw err;
+
+                    for (i = 0; i < result.length; i++) {
+                        console.log("test barcode vals: " + result[i].testBarcode)
+                        if (testbarcode1 == result[i].testBarcode || testbarcode2 == result[i].testBarcode || testbarcode3 == result[i].testBarcode || testbarcode4 == result[i].testBarcode || testbarcode5 == result[i].testBarcode) // if the test barcode already exists, set testbarcodeExists to true
+                            testbarcodeExists = true
+                    }
+                    console.log("is testbarcode not in table? " + testbarcodeExists)
+
+                    if (poolBarcodeDoesNotExist && testbarcodeExists) {
+                        //inserts into the pool table first
+                        let sqlQuery = `INSERT INTO Pool(poolBarcode) VALUES ('` + poolbarcode + `')`;
+                        console.log(sqlQuery);
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
+
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode1 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode2 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode3 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode4 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
+                        });
 
-                            //inserts into the poolMapping table
-                            sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
+                        //inserts into the poolMapping table
+                        sqlQuery = `INSERT INTO poolMap(testBarcode, poolBarcode)
                             VALUES ((SELECT testBarcode from EmployeeTest WHERE testBarcode = '` + testbarcode5 + `'), 
                             (SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'))`;
-                            connection.query(sqlQuery, function(err, results){
-                                if(err) throw err;
-                            });
-
-                        } else {
-                            console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
-                            // DO NOT ADD extra row to the html
-                            // implement extra code
-                            }
+                        connection.query(sqlQuery, function (err, results) {
+                            if (err) throw err;
                         });
-                    });
-                }
-            res.redirect('/poolMapping')
-            res.end();
-        }catch(e){
-                console.log("did not add pool mapping");
+
+                    } else {
+                        console.log("Either pool Barcode already exists or test barcode doesn't exist in the database")
+                        // DO NOT ADD extra row to the html
+                        // implement extra code
+                    }
+                });
+            });
         }
+        res.redirect('/poolMapping')
+        res.end();
+    } catch (e) {
+        console.log("did not add pool mapping");
+    }
 });
 
 
@@ -1313,15 +1381,23 @@ The HTML page sends which line to edit to app.js and what the new status is
    app.js returns a json to the front end
 Render that json */
 
-app.get("/wellTesting", function(req, res){
+app.get("/wellTesting", function (req, res) {
     try {
-        res.writeHead(200, {"Content-Type": "text/html"});
+        res.writeHead(200, {
+            "Content-Type": "text/html"
+        });
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
         let html = `<html>
         <head>
         <title>Well Testing</title>
         </head>
         <style type="text/css">
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
             h1 {
                 text-align: center;
                 padding: 8px;
@@ -1337,10 +1413,10 @@ app.get("/wellTesting", function(req, res){
             .wellBar {
                 width: 362px;
                 margin: 20 0 0 450px;
+                margin:auto;
                 padding: 40px;
                 background: #9fa2f5;
                 border-radius: 15px;
-                position: absolute;
                 left: 180px;
             }
         
@@ -1414,6 +1490,9 @@ app.get("/wellTesting", function(req, res){
         </style>
         <body>
             <h1>Well Testing</h1>
+            <form id="return" action='/labHome' method="get">
+                    <input type="submit" id="return" value="Return" />
+            </form>
             <form id = "addWT" action = '/addWellTesting' method = "get">
                 <div class="wellBar">
                     <label for="wellBarcode"><b> Well Barcode
@@ -1451,18 +1530,15 @@ app.get("/wellTesting", function(req, res){
             <br>
         
                 <input type="submit" id="edit" value="Edit" />
-            </form>
-            <form id="return" action='/labHome' method="get">
-                <input type="submit" id="return" value="Return" />
             </form>`;
-            connection.query(constructSQLWellCommand(), function(err, results){
-                if(err) throw err;
-                let arr = writeWellTable(results);
-                //console.log(arr);
-                html = html.replace("<tr></tr>", arr)
-                res.write(html + "\n\n</body>\n</html>");
-                res.end();
-            });
+        connection.query(constructSQLWellCommand(), function (err, results) {
+            if (err) throw err;
+            let arr = writeWellTable(results);
+            //console.log(arr);
+            html = html.replace("<tr></tr>", arr)
+            res.write(html + "\n\n</body>\n</html>");
+            res.end();
+        });
     } // end of try block
     catch (e) {
         console.log("could not add");
@@ -1478,6 +1554,12 @@ app.get("/addWellTesting", function (req, res) {
         <title>Well Testing</title>
         </head>
         <style type="text/css">
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
             h1 {
                 text-align: center;
                 padding: 8px;
@@ -1494,9 +1576,9 @@ app.get("/addWellTesting", function (req, res) {
                 width: 362px;
                 margin: 20 0 0 450px;
                 padding: 40px;
+                margin:auto;
                 background: #9fa2f5;
                 border-radius: 15px;
-                position: absolute;
                 left: 180px;
             }
         
@@ -1570,6 +1652,9 @@ app.get("/addWellTesting", function (req, res) {
         </style>
         <body>
             <h1>Well Testing</h1>
+            <form id="return" action='/labHome' method="get">
+                    <input type="submit" id="return" value="Return" />
+            </form>
             <form id = "addWT" action = '/addWellTesting' method = "get">
                 <div class="wellBar">
                     <label for="wellBarcode"><b> Well Barcode
@@ -1603,11 +1688,7 @@ app.get("/addWellTesting", function (req, res) {
                 </table>
             </div>
             <br>
-        
                 <input type="submit" id="edit" value="Edit" />
-            </form>
-            <form id="return" action='/labHome' method="get">
-                    <input type="submit" id="return" value="Return" />
             </form>`;
 
         let query = url.parse(req.url, true).query; // this has all of the html body, don't need to use bodyparser
@@ -1625,7 +1706,7 @@ app.get("/addWellTesting", function (req, res) {
         // connection.query(sqlQuery, function(err, results){
         //     if(err) throw err;
         // });
-        
+
         // //inserts into the wellTesting table
         // sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
         // VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
@@ -1665,17 +1746,17 @@ app.get("/addWellTesting", function (req, res) {
                     //inserts into the well table first
                     let sqlQuery = `INSERT INTO Well(wellBarcode) VALUES ('` + wellbarcode + `')`;
                     console.log(sqlQuery);
-                    connection.query(sqlQuery, function(err, results){
-                        if(err) throw err;
+                    connection.query(sqlQuery, function (err, results) {
+                        if (err) throw err;
                     });
-                    
+
                     //inserts into the wellTesting table
                     sqlQuery = `INSERT INTO WellTesting(poolBarcodeFK, wellBarcodeFK, testingStartTime, testingEndTime, result)
                     VALUES ((SELECT poolBarcode from Pool WHERE poolBarcode = '` + poolbarcode + `'), 
                     (SELECT wellBarcode from Well WHERE wellBarcode = '` + wellbarcode + `'), 
                     CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), '` + employeeResult + `')`;
-                    connection.query(sqlQuery, function(err, results){
-                        if(err) throw err;
+                    connection.query(sqlQuery, function (err, results) {
+                        if (err) throw err;
                     });
                 } else {
                     console.log("Either Well Barcode already exists or Pool barcode doesn't exist in the database")
@@ -1684,8 +1765,8 @@ app.get("/addWellTesting", function (req, res) {
                 }
             });
         });
-        connection.query(constructSQLWellCommand(), function(err, results){
-            if(err) throw err;
+        connection.query(constructSQLWellCommand(), function (err, results) {
+            if (err) throw err;
             let arr = writeWellTable(results);
             console.log(arr);
             res.redirect('/wellTesting')
@@ -1701,7 +1782,7 @@ app.get("/editWellTesting", function (req, res) {
     try {
         let query = url.parse(req.url, true).query;
         console.log(query.edit);
-        
+
 
     } // end of try block
     catch (e) {
@@ -1709,22 +1790,22 @@ app.get("/editWellTesting", function (req, res) {
     }
 });
 
-function constructSQLWellCommand(){
+function constructSQLWellCommand() {
     var sql = `SELECT * FROM WellTesting W1, Well W
                 WHERE W.wellBarcode = W1.wellBarcodeFK;`;
     return sql;
 };
 
 // Updates the Well Testing HTML table dependent on the queries made to the database
-function writeWellTable(SQLResult){
+function writeWellTable(SQLResult) {
     console.log(SQLResult);
     let tableStr = "";
-    for(let item of SQLResult){
-        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK +"\"></td>" +
-        "<td> " + item.wellBarcodeFK + " </td>" +
-        "<td> " + item.poolBarcodeFK + " </td>" +
-        "<td> " + item.result + " </td>" +
-        "</tr>";
+    for (let item of SQLResult) {
+        tableStr += "<tr><td><input type=\"radio\" id=\"" + item.wellBarcodeFK + "\" value=\"" + item.wellBarcodeFK + "\"></td>" +
+            "<td> " + item.wellBarcodeFK + " </td>" +
+            "<td> " + item.poolBarcodeFK + " </td>" +
+            "<td> " + item.result + " </td>" +
+            "</tr>";
     }
     console.log(tableStr);
     return tableStr;
